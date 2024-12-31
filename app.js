@@ -2,6 +2,7 @@ import express, { json as jsonMiddleware } from 'express'
 import sqlite3 from 'sqlite3'
 import corsMiddleware from 'cors'
 import { usersRouter } from './routers/users.router.js'
+import { postsRouter } from './routers/posts.router.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -13,6 +14,7 @@ app.disable('x-powered-by')
 app.use(corsMiddleware())
 app.use(jsonMiddleware())
 app.use('/users', usersRouter)
+app.use('/posts', postsRouter)
 
 app.listen(port, () =>
   console.log(`Example app listening on port http://localhost:${port}/`)

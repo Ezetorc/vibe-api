@@ -7,12 +7,6 @@ export class UsersController {
     response.json(users)
   }
 
-  static async getByEmail (request, response) {
-    const { email } = request.params
-    const users = await UsersModel.getByEmail({ email })
-    response.json(users)
-  }
-
   static async getById (request, response) {
     const { id } = request.params
     const users = await UsersModel.getById({ id })
@@ -21,6 +15,7 @@ export class UsersController {
 
   static async create (request, response) {
     const result = validateUser(request.body)
+    const { name, email } = result.data
 
     if (result.error) {
       return response
@@ -28,9 +23,9 @@ export class UsersController {
         .json({ error: JSON.parse(result.error.message) })
     }
 
-    const existingUser = await UsersModel.getByEmail(result.data.email)
-    if (existingUser) {
-      return response.status(400).json({ error: 'Email already in use' })
+    const userExists = await UsersModel.exists({ name, email })
+    if (userExists) {
+      return response.status(400).json({ error: 'User already exists' })
     }
 
     const newUser = await UsersModel.create(result.data)
