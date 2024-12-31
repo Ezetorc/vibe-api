@@ -36,7 +36,7 @@ export class PostsModel {
       `
       const params = [userId, content]
 
-      database.run(query, params, function (error) {
+      database.run(query, params, error => {
         if (error) {
           reject(error)
         } else {
@@ -54,7 +54,7 @@ export class PostsModel {
       const query = 'DELETE FROM posts WHERE id = ?'
       const params = [id]
 
-      database.run(query, params, function (error) {
+      database.run(query, params, error => {
         if (error) {
           reject(error)
         } else {

@@ -2,7 +2,7 @@ import zod from 'zod'
 
 const postSchema = zod.object({
   id: zod.number().optional(),
-  user_id: zod.number().optional(),
+  user_id: zod.number(),
   content: zod
     .string({
       invalid_type_error: 'Content must be a string',
