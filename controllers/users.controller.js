@@ -1,5 +1,7 @@
+import { SECRET_KEY } from '../config.js'
 import { UsersModel } from '../models/users.model.js'
-import { validatePartialUser, validateUser } from '../schemas/user.schema.js'
+import { validatePartialUser } from '../schemas/user.schema.js'
+import jwt from 'jsonwebtoken'
 
 export class UsersController {
   static async getAll (_request, response) {
@@ -13,9 +15,9 @@ export class UsersController {
     response.json(users)
   }
 
-  static async create (request, response) {
-    const result = validateUser(request.body)
-    const { name, email } = result.data
+  static async register (request, response) {
+    const { name, email, password } = request.body
+    const result = validatePartialUser({ name, email, password })
 
     if (result.error) {
       return response
@@ -23,13 +25,40 @@ export class UsersController {
         .json({ error: JSON.parse(result.error.message) })
     }
 
-    const userExists = await UsersModel.exists({ name, email })
-    if (userExists) {
-      return response.status(400).json({ error: 'User already exists' })
+    try {
+      const newUser = await UsersModel.register({ name, email, password })
+      return response.status(201).json({ success: true, id: newUser.id })
+    } catch (error) {
+      return response.status(400).json({ success: false, id: -1 })
+    }
+  }
+
+  static async login (request, response) {
+    const { name, password } = request.body
+    const result = validatePartialUser({ name, password })
+
+    if (result.error) {
+      return response
+        .status(400)
+        .json({ error: JSON.parse(result.error.message) })
     }
 
-    const newUser = await UsersModel.create(result.data)
-    response.status(201).json(newUser)
+    try {
+      const user = await UsersModel.login({ name, password })
+      const token = jwt.sign({ user }, SECRET_KEY, {
+        expiresIn: '1h'
+      })
+      response
+        .cookie('access_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_END === 'production',
+          sameSite: 'strict',
+          maxAge: 1000 * 60 * 60
+        })
+        .json({ success: true, id: user.id })
+    } catch (error) {
+      response.status(401).json({ success: false, id: -1 })
+    }
   }
 
   static async delete (request, response) {
