@@ -13,11 +13,29 @@ export class PostsModel {
     })
   }
 
-  static async getById ({ id }) {
-    return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM posts WHERE id = ?'
-      const params = [id]
+  static async search ({ query }) {
+    const params = [`%${query}%`]
+    const sqlQuery = `
+      SELECT * 
+      FROM posts 
+      WHERE content LIKE ?`
 
+    return new Promise((resolve, reject) => {
+      database.all(sqlQuery, params, (error, rows) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(rows)
+        }
+      })
+    })
+  }
+
+  static async getById ({ id }) {
+    const query = 'SELECT * FROM posts WHERE id = ?'
+    const params = [id]
+
+    return new Promise((resolve, reject) => {
       database.get(query, params, (error, row) => {
         if (error) {
           reject(error)

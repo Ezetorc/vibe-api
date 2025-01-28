@@ -13,6 +13,22 @@ export class PostsController {
     response.json(posts)
   }
 
+  static async search (request, response) {
+    const { query } = request.params
+
+    if (!query || query.trim() === '') {
+      return response.status(400).json({ error: 'Query parameter is required' })
+    }
+
+    try {
+      const posts = await PostsModel.search({ query })
+      response.json(posts)
+    } catch (error) {
+      console.error('Search error:', error)
+      response.status(500).json({ error: 'Internal Server Error' })
+    }
+  }
+
   static async create (request, response) {
     const result = validatePost(request.body)
 
@@ -46,7 +62,10 @@ export class PostsController {
         .json({ error: JSON.parse(result.error.message) })
     }
 
-    const updatedPost = await PostsModel.update({ id: request.params.id, object: result.data })
+    const updatedPost = await PostsModel.update({
+      id: request.params.id,
+      object: result.data
+    })
 
     if (!updatedPost || updatedPost.changes === 0) {
       return response

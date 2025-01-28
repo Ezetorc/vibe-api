@@ -7,7 +7,7 @@ const userSchema = zod.object({
       invalid_type_error: 'Name must be a string',
       required_error: 'Name is required'
     })
-    .min(1, 'Name must be at minimum 1 character.')
+    .min(3, 'Name must be at minimum 3 character.')
     .max(20, 'Name must be at most 20 characters'),
   email: zod
     .string({

@@ -64,6 +64,24 @@ export class UsersModel {
     })
   }
 
+  static async search ({ query }) {
+    const params = [`%${query}%`, `%${query}%`]
+    const sqlQuery = `
+      SELECT * 
+      FROM users 
+      WHERE name LIKE ? OR description LIKE ?`
+
+    return new Promise((resolve, reject) => {
+      database.all(sqlQuery, params, (error, rows) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(rows)
+        }
+      })
+    })
+  }
+
   static async register ({ name, email, password }) {
     const userAlreadyExists = await this.exists({ name, email })
 
@@ -73,12 +91,11 @@ export class UsersModel {
       INSERT INTO users (name, email, password)
       VALUES (?, ?, ?)
     `
-
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS)
     const params = [name, email, hashedPassword]
 
     return new Promise((resolve, reject) => {
-      database.run(query, params, error => {
+      database.run(query, params, function (error) {
         if (error) {
           reject(error)
         } else {
@@ -101,6 +118,7 @@ export class UsersModel {
     }
 
     const isValid = await bcrypt.compare(password, user.password)
+
     if (!isValid) {
       throw new Error('Invalid password')
     }
@@ -139,15 +157,18 @@ export class UsersModel {
       const params = [...Object.values(object), id]
       const query = `UPDATE users SET ${setClause} WHERE id = ?`
 
-      database.run(query, params, function (error) {
+      database.run(query, params, async function (error) {
         if (error) {
           reject(error)
+        } else if (this.changes === 0) {
+          reject(new Error('No changes were made, or user not found'))
         } else {
-          resolve({
-            changes: this.changes,
-            id,
-            ...object
-          })
+          try {
+            const updatedUser = await UsersModel.getById({ id })
+            resolve(updatedUser)
+          } catch (fetchError) {
+            reject(fetchError)
+          }
         }
       })
     })
