@@ -11,6 +11,7 @@ usersRouter.post('/logout', tokenMiddleware, UsersController.logout)
 usersRouter.get('/search/:query', UsersController.search)
 usersRouter.get('/', UsersController.getAll)
 usersRouter.get('/id/:id', UsersController.getById)
+usersRouter.get('/username/:username', UsersController.getByUsername)
 
 usersRouter.delete('/id/:id', tokenMiddleware, UsersController.delete)
 

@@ -15,6 +15,21 @@ export class UsersModel {
     })
   }
 
+  static async getByUsername ({ username }) {
+    const query = 'SELECT * FROM users WHERE name = ?'
+    const params = [username]
+
+    return new Promise((resolve, reject) => {
+      database.get(query, params, (error, row) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(row)
+        }
+      })
+    })
+  }
+
   static async getById ({ id }) {
     const query = 'SELECT * FROM users WHERE id = ?'
     const params = [id]
@@ -157,7 +172,7 @@ export class UsersModel {
       const params = [...Object.values(object), id]
       const query = `UPDATE users SET ${setClause} WHERE id = ?`
 
-      database.run(query, params, async function (error) {
+      database.run(query, params, async error => {
         if (error) {
           reject(error)
         } else if (this.changes === 0) {

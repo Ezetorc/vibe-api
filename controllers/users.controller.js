@@ -8,6 +8,12 @@ export class UsersController {
     response.json(users)
   }
 
+  static async getByUsername (request, response) {
+    const { username } = request.params
+    const users = await UsersModel.getByUsername({ username })
+    response.json(users)
+  }
+
   static async getById (request, response) {
     const { id } = request.params
     const users = await UsersModel.getById({ id })
