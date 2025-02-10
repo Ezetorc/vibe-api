@@ -10,7 +10,7 @@ import cookieMiddleware from 'cookie-parser'
 const app = express()
 const port = process.env.PORT || PORT
 export const database = new sqlite3.Database(
-  'C:/Users/ezepl/Documents/Databases/vibedb.db'
+  'C:/Users/ezepl/Documents/Code/Databases/vibedb.db'
 )
 
 app.use(cookieMiddleware())
