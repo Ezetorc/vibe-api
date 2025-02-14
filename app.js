@@ -7,6 +7,7 @@ import { postsRouter } from './routers/posts.router.js'
 import { likesRouter } from './routers/likes.router.js'
 import cookieMiddleware from 'cookie-parser'
 import { followersRouter } from './routers/followers.router.js'
+import { commentsRouter } from './routers/comments.router.js'
 
 const app = express()
 const port = process.env.PORT || PORT
@@ -37,6 +38,7 @@ app.use('/users', usersRouter)
 app.use('/posts', postsRouter)
 app.use('/likes', likesRouter)
 app.use('/followers', followersRouter)
+app.use('/comments', commentsRouter)
 
 app.listen(port, () =>
   console.log(`Vibe API listening on port http://localhost:${port}/`)
