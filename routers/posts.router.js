@@ -10,6 +10,6 @@ postsRouter.get('/id/:id', PostsController.getById)
 
 postsRouter.post('/', tokenMiddleware, PostsController.create)
 
-postsRouter.delete('/id/:id', tokenMiddleware, PostsController.delete)
+postsRouter.delete('/id/:id', PostsController.delete)
 
 postsRouter.patch('/id/:id', tokenMiddleware, PostsController.update)

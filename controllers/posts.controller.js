@@ -46,7 +46,7 @@ export class PostsController {
     const { id } = request.params
     const result = await PostsModel.delete({ id })
 
-    if (result === 0) {
+    if (!result) {
       return response.status(404).json({ message: 'Post not found' })
     }
 

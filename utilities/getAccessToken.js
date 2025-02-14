@@ -9,12 +9,12 @@ export function getAccessToken (user) {
   }
 
   return {
-    token: jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' }),
+    token: jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' }),
     config: {
       httpOnly: false,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 60
+      maxAge: 24 * 60 * 60 * 1000
     }
   }
 }

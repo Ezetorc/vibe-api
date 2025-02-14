@@ -8,6 +8,12 @@ export class UsersController {
     response.json(users)
   }
 
+  static async emailExists (request, response) {
+    const { email } = request.params
+    const emailExists = await UsersModel.emailExists({ email })
+    response.json(emailExists)
+  }
+
   static async getByUsername (request, response) {
     const { username } = request.params
     const users = await UsersModel.getByUsername({ username })

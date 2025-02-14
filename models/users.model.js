@@ -15,6 +15,19 @@ export class UsersModel {
     })
   }
 
+  static async emailExists ({ email }) {
+    return new Promise((resolve, reject) => {
+      const query = 'SELECT 1 FROM users WHERE email = ?'
+      database.get(query, [email], (error, row) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(!!row)
+        }
+      })
+    })
+  }
+
   static async getByUsername ({ username }) {
     const query = 'SELECT * FROM users WHERE name = ?'
     const params = [username]
@@ -65,7 +78,7 @@ export class UsersModel {
       const query = `
         SELECT 1 
         FROM users 
-        WHERE name = ? AND email = ?
+        WHERE name = ? OR email = ?
       `
       const params = [name, email]
 
@@ -80,11 +93,12 @@ export class UsersModel {
   }
 
   static async search ({ query }) {
-    const params = [`%${query}%`, `%${query}%`]
+    const params = [`%${query}%`, `%${query}%`, `%${query}%`]
     const sqlQuery = `
       SELECT * 
       FROM users 
-      WHERE name LIKE ? OR description LIKE ?`
+      WHERE name LIKE ? OR email LIKE ? OR description LIKE ?
+    `
 
     return new Promise((resolve, reject) => {
       database.all(sqlQuery, params, (error, rows) => {
@@ -149,8 +163,10 @@ export class UsersModel {
       database.run(query, params, function (error) {
         if (error) {
           reject(error)
+        } else if (this.changes === 0) {
+          reject(new Error('User not found'))
         } else {
-          resolve(this.changes)
+          resolve({ message: 'User deleted successfully' })
         }
       })
     })
@@ -166,24 +182,23 @@ export class UsersModel {
         return reject(new Error('"created_at" cannot be updated'))
       }
 
+      if (object.password) {
+        object.password = bcrypt.hashSync(object.password, SALT_ROUNDS)
+      }
+
       const setClause = Object.keys(object)
         .map(key => `${key} = ?`)
         .join(', ')
       const params = [...Object.values(object), id]
       const query = `UPDATE users SET ${setClause} WHERE id = ?`
 
-      database.run(query, params, async error => {
+      database.run(query, params, function (error) {
         if (error) {
           reject(error)
         } else if (this.changes === 0) {
           reject(new Error('No changes were made, or user not found'))
         } else {
-          try {
-            const updatedUser = await UsersModel.getById({ id })
-            resolve(updatedUser)
-          } catch (fetchError) {
-            reject(fetchError)
-          }
+          UsersModel.getById({ id }).then(resolve).catch(reject)
         }
       })
     })

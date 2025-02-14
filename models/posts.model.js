@@ -76,7 +76,7 @@ export class PostsModel {
         if (error) {
           reject(error)
         } else {
-          resolve(this.changes)
+          resolve(true)
         }
       })
     })
