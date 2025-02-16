@@ -1,10 +1,10 @@
 {
   "name": "vibe-api",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "main.ts",
   "scripts": {
-    "start": "node --watch app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "npm run build && node --watch dist/main.js"
   },
   "keywords": [],
   "type": "module",
@@ -15,15 +15,23 @@
     "extends": "standard"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.8",
     "standard": "^17.1.2"
   },
   "dependencies": {
+    "@types/node": "^22.13.4",
+    "api-responser": "^2.5.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "sqlite3": "5.1.7",
+    "typescript": "^5.7.3",
     "zod": "^3.24.1"
   }
 }
