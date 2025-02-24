@@ -1,10 +1,19 @@
-import { Comment } from '../schemas/comment.schema'
-import { DATABASE } from '../settings'
+import { Comment } from '../schemas/comment.schema.js'
+import { DATABASE } from '../settings.js'
+import { Query } from '../structures/Query.js'
+import { getDataByAmount } from '../utilities/getDataByAmount.js'
 
 export class CommentModel {
-  static async getAll (): Promise<Comment[]> {
-    const query: string = 'SELECT * FROM comments'
-    const params: string[] = []
+  static async getAll (args: {
+    amount?: Query
+    page?: Query
+  }): Promise<Comment[]> {
+    const { query, params } = getDataByAmount({
+      amount: Number(args.amount),
+      query: 'SELECT * FROM comments',
+      page: Number(args.page),
+      params: []
+    })
 
     return new Promise((resolve, reject) => {
       DATABASE.all(query, params, (error, rows) => {
@@ -12,6 +21,26 @@ export class CommentModel {
           reject(error)
         } else {
           resolve(rows as Comment[])
+        }
+      })
+    })
+  }
+
+  static async create (args: {
+    userId: number
+    postId: number
+    content: string
+  }): Promise<boolean> {
+    const query =
+      'INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)'
+    const params = [args.userId, args.postId, args.content]
+
+    return new Promise((resolve, reject) => {
+      DATABASE.run(query, params, error => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(true)
         }
       })
     })

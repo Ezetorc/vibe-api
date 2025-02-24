@@ -1,5 +1,5 @@
-import { Like } from '../schemas/like.schema'
-import { DATABASE } from '../settings'
+import { Like } from '../schemas/like.schema.js'
+import { DATABASE } from '../settings.js'
 
 export class LikeModel {
   static async getAllOfPost (args: { postId: number }): Promise<Like[]> {

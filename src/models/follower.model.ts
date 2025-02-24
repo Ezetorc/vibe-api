@@ -1,5 +1,5 @@
-import { Follower } from '../schemas/follower.schema'
-import { DATABASE } from '../settings'
+import { Follower } from '../schemas/follower.schema.js'
+import { DATABASE } from '../settings.js'
 
 export class FollowerModel {
   static async getAll (): Promise<Follower[]> {

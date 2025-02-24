@@ -6,8 +6,9 @@ import { SafeParseReturnType } from 'zod'
 import { AccessToken } from '../structures/AccessToken.js'
 
 export class UserController {
-  static async getAll (_request: Request, response: Response): Promise<void> {
-    const users: User[] = await UserModel.getAll()
+  static async getAll (request: Request, response: Response): Promise<void> {
+    const { amount, page } = request.query
+    const users: User[] = await UserModel.getAll({ amount, page })
 
     response.json(users)
   }
@@ -22,14 +23,21 @@ export class UserController {
     response.json(emailExists)
   }
 
+  static async nameExists (request: Request, response: Response): Promise<void> {
+    const { name } = request.params
+    const nameExists: boolean = await UserModel.exists({ name })
+
+    response.json(nameExists)
+  }
+
   static async getByUsername (
     request: Request,
     response: Response
   ): Promise<void> {
     const { username } = request.params
-    const users: User = await UserModel.getByName({ name: username })
+    const user: User | null = await UserModel.getByName({ name: username })
 
-    response.json(users)
+    response.json(user)
   }
 
   static async getById (request: Request, response: Response): Promise<void> {
@@ -76,7 +84,13 @@ export class UserController {
       return
     }
 
-    const registeredUser: User = await UserModel.getByName({ name })
+    const registeredUser: User | null = await UserModel.getByName({ name })
+
+    if (!registeredUser) {
+      response.status(400).json({ message: 'User not found' })
+      return
+    }
+
     const accessToken: AccessToken = getAccessToken(registeredUser)
 
     response
@@ -92,12 +106,18 @@ export class UserController {
       password
     })
 
-    if (result.error) {
-      response.status(400).json({ error: JSON.parse(result.error.message) })
+    if (!result.success) {
+      response.status(400).json({ error: "Invalid name or password" })
       return
     }
 
-    const user: User = await UserModel.login({ name, password })
+    const user: User | null = await UserModel.login({ name, password })
+
+    if (!user) {
+      response.json({ success: false })
+      return
+    }
+
     const accessToken: AccessToken = getAccessToken(user)
 
     response

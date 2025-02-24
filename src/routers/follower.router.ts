@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { FollowerController } from '../controllers/follower.controller'
+import { FollowerController } from '../controllers/follower.controller.js'
 
 export const FollowerRouter = Router()
 

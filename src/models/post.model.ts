@@ -1,10 +1,16 @@
-import { Post } from '../schemas/post.schema'
-import { DATABASE } from '../settings'
+import { Post } from '../schemas/post.schema.js'
+import { DATABASE } from '../settings.js'
+import { Query } from '../structures/Query.js'
+import { getDataByAmount } from '../utilities/getDataByAmount.js'
 
 export class PostModel {
-  static async getAll (): Promise<Post[]> {
-    const query: string = 'SELECT * FROM posts'
-    const params: string[] = []
+  static async getAll (args: { amount?: Query; page?: Query }): Promise<Post[]> {
+    const { query, params } = getDataByAmount({
+      amount: Number(args.amount),
+      query: 'SELECT * FROM posts',
+      page: Number(args.page),
+      params: []
+    })
 
     return new Promise((resolve, reject) => {
       DATABASE.all(query, params, (error, rows) => {
@@ -17,9 +23,17 @@ export class PostModel {
     })
   }
 
-  static async search (args: { query: string }): Promise<Post[]> {
-    const query: string = 'SELECT * FROM posts WHERE content LIKE ?'
-    const params: string[] = [`%${args.query}%`]
+  static async search (args: {
+    query: string
+    userId?: Query
+  }): Promise<Post[]> {
+    const query = args.userId
+      ? 'SELECT * FROM posts WHERE content LIKE ? AND user_id = ?'
+      : 'SELECT * FROM posts WHERE content LIKE ?'
+
+    const params = args.userId
+      ? [`%${args.query}%`, args.userId]
+      : [`%${args.query}%`]
 
     return new Promise((resolve, reject) => {
       DATABASE.all(query, params, (error, rows) => {

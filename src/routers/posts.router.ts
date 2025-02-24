@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { PostController } from '../controllers/post.controller.ts'
-import { tokenMiddleware } from '../middlewares/token.middleware.ts'
+import { PostController } from '../controllers/post.controller.js'
+import { tokenMiddleware } from '../middlewares/token.middleware.js'
 
 export const PostRouter = Router()
 

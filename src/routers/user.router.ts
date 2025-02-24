@@ -1,19 +1,20 @@
 import { Router } from 'express'
-import { UsersController } from '../controllers/user.controller.js'
-import { tokenMiddleware } from '../middlewares/token.middleware.ts'
+import { UserController } from '../controllers/user.controller.js'
+import { tokenMiddleware } from '../middlewares/token.middleware.js'
 
 export const UserRouter = Router()
 
-UserRouter.post('/register', UsersController.register)
-UserRouter.post('/login', UsersController.login)
-UserRouter.post('/logout', tokenMiddleware, UsersController.logout)
+UserRouter.post('/register', UserController.register)
+UserRouter.post('/login', UserController.login)
+UserRouter.post('/logout', tokenMiddleware, UserController.logout)
 
-UserRouter.get('/search/:query', UsersController.search)
-UserRouter.get('/', UsersController.getAll)
-UserRouter.get('/id/:id', UsersController.getById)
-UserRouter.get('/username/:username', UsersController.getByUsername)
-UserRouter.get('/emailExists/:email', UsersController.emailExists)
+UserRouter.get('/search/:query', UserController.search)
+UserRouter.get('/', UserController.getAll)
+UserRouter.get('/id/:id', UserController.getById)
+UserRouter.get('/username/:username', UserController.getByUsername)
+UserRouter.get('/emailExists/:email', UserController.emailExists)
+UserRouter.get('/nameExists/:name', UserController.nameExists)
 
-UserRouter.delete('/id/:id', tokenMiddleware, UsersController.delete)
+UserRouter.delete('/id/:id', tokenMiddleware, UserController.delete)
 
-UserRouter.patch('/id/:id', tokenMiddleware, UsersController.update)
+UserRouter.patch('/id/:id', tokenMiddleware, UserController.update)

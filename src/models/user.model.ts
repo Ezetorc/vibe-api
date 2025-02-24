@@ -1,11 +1,17 @@
-import { User } from '../schemas/user.schema'
-import { DATABASE, SALT_ROUNDS } from '../settings'
+import { User } from '../schemas/user.schema.js'
+import { DATABASE, SALT_ROUNDS } from '../settings.js'
 import bcrypt from 'bcrypt'
+import { Query } from '../structures/Query.js'
+import { getDataByAmount } from '../utilities/getDataByAmount.js'
 
 export class UserModel {
-  static async getAll (): Promise<User[]> {
-    const query: string = 'SELECT * FROM users'
-    const params: string[] = []
+  static async getAll (args: { amount?: Query; page?: Query }): Promise<User[]> {
+    const { query, params } = getDataByAmount({
+      amount: Number(args.amount),
+      query: 'SELECT * FROM users',
+      page: Number(args.page),
+      params: []
+    })
 
     return new Promise((resolve, reject) => {
       DATABASE.all(query, params, (error, rows) => {
@@ -33,7 +39,7 @@ export class UserModel {
     })
   }
 
-  static async getByName (args: { name: string }): Promise<User> {
+  static async getByName (args: { name: string }): Promise<User | null> {
     const query: string = 'SELECT * FROM users WHERE name = ?'
     const params: string[] = [args.name]
 
@@ -42,7 +48,7 @@ export class UserModel {
         if (error) {
           reject(error)
         } else {
-          resolve(row as User)
+          resolve(row as User | null)
         }
       })
     })
@@ -65,7 +71,7 @@ export class UserModel {
       query = 'SELECT 1 FROM users WHERE email = ?'
       params = [args.email]
     } else {
-      throw new Error('You must pass a name or email')
+      return false
     }
 
     return new Promise((resolve, reject) => {
@@ -124,14 +130,17 @@ export class UserModel {
     })
   }
 
-  static async login (args: { name: string; password: string }): Promise<User> {
-    const user: User = await this.getByName({ name: args.name })
+  static async login (args: {
+    name: string
+    password: string
+  }): Promise<User | null> {
+    const user: User | null = await this.getByName({ name: args.name })
 
-    if (!user) throw new Error("User doesn't exist")
+    if (!user) return null
 
     const isValid: boolean = await bcrypt.compare(args.password, user.password)
 
-    if (!isValid) throw new Error('Invalid password')
+    if (!isValid) return null
 
     return user
   }

@@ -8,8 +8,9 @@ import {
 import { SafeParseReturnType } from 'zod'
 
 export class PostController {
-  static async getAll (_request: Request, response: Response): Promise<void> {
-    const posts: Post[] = await PostModel.getAll()
+  static async getAll (request: Request, response: Response): Promise<void> {
+    const { amount, page } = request.query
+    const posts: Post[] = await PostModel.getAll({ amount, page })
 
     response.json(posts)
   }
@@ -23,13 +24,14 @@ export class PostController {
 
   static async search (request: Request, response: Response): Promise<void> {
     const { query } = request.params
+    const { userId  } = request.query
 
     if (!query || query.trim() === '') {
       response.status(400).json({ error: 'Query parameter is required' })
       return
     }
 
-    const posts: Post[] = await PostModel.search({ query })
+    const posts: Post[] = await PostModel.search({ query, userId })
 
     response.json(posts)
   }

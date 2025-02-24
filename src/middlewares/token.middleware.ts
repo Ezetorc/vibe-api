@@ -1,8 +1,9 @@
-import { verify } from 'jsonwebtoken'
+const jsonwebtoken = await import('jsonwebtoken');
+const { verify } = jsonwebtoken.default;
 import { NextFunction, Request, Response } from 'express'
-import { SECRET_KEY } from '../settings'
-import { User } from '../schemas/user.schema'
-import { CustomJwtPayload } from '../structures/CustomJWTPayload'
+import { SECRET_KEY } from '../settings.js'
+import { User } from '../schemas/user.schema.js'
+import { CustomJwtPayload } from '../structures/CustomJWTPayload.js'
 
 declare global {
   namespace Express {
