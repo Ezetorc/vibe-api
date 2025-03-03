@@ -9,7 +9,12 @@ export class PostController {
     static async getById(request, response) {
         const { id } = request.params;
         const post = await PostModel.getById({ id: Number(id) });
-        response.json(post);
+        if (post) {
+            response.json(post);
+        }
+        else {
+            response.json('Post not found');
+        }
     }
     static async search(request, response) {
         const { query } = request.params;

@@ -22,7 +22,8 @@ export const UserSchema = zod.object({
     })
     .min(6, 'Password must be at minimum 6 characters.')
     .max(30, 'Password must be at most 30 characters'),
-  profile_image_id: zod.string().nullable().optional(),
+  image_id: zod.string().nullable().optional(),
+  image_url: zod.string().nullable().optional(),
   description: zod
     .string({ invalid_type_error: 'Description must be a string' })
     .max(200, 'Description must be at most 200 characters')

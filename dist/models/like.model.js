@@ -60,12 +60,20 @@ export class LikeModel {
         const query = 'INSERT INTO likes (target_id, type, user_id) VALUES (?, ?, ?)';
         const params = [args.targetId, args.type, args.userId];
         return new Promise((resolve, reject) => {
-            DATABASE.run(query, params, error => {
+            DATABASE.run(query, params, function (error) {
                 if (error) {
                     reject(error);
                 }
                 else {
-                    resolve(true);
+                    const likeId = this.lastID;
+                    DATABASE.get('SELECT * FROM likes WHERE id = ?', [likeId], (err, row) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        else {
+                            resolve(row);
+                        }
+                    });
                 }
             });
         });

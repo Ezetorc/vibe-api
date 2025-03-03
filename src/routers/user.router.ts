@@ -7,6 +7,7 @@ export const UserRouter = Router()
 UserRouter.post('/register', UserController.register)
 UserRouter.post('/login', UserController.login)
 UserRouter.post('/logout', tokenMiddleware, UserController.logout)
+UserRouter.post('/image/:id', UserController.deleteImage)
 
 UserRouter.get('/search/:query', UserController.search)
 UserRouter.get('/', UserController.getAll)

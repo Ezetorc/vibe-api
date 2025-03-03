@@ -9,20 +9,20 @@ export class CommentController {
     static async create(request, response) {
         const isNewCommentValid = validateComment(request.body);
         if (!isNewCommentValid.success) {
-            response.status(400).json({ error: isNewCommentValid.error });
+            response.status(400).json(isNewCommentValid.error);
             return;
         }
         const { post_id: postId, content, user_id: userId } = isNewCommentValid.data;
-        const newCommentCreated = await CommentModel.create({
+        const newComment = await CommentModel.create({
             content,
             postId,
             userId
         });
-        if (!newCommentCreated) {
-            response.status(404).json({ message: 'Error while creating comment' });
+        if (newComment == null) {
+            response.status(404).json(null);
             return;
         }
-        response.json({ message: 'Comment created successfully' });
+        response.json(newComment);
     }
     static async delete(request, response) {
         const { id } = request.params;

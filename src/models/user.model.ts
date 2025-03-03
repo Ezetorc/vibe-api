@@ -24,7 +24,7 @@ export class UserModel {
     })
   }
 
-  static async getById (args: { id: number }): Promise<User> {
+  static async getById (args: { id: number }): Promise<User | null> {
     const query: string = 'SELECT * FROM users WHERE id = ?'
     const params: number[] = [args.id]
 
@@ -33,7 +33,7 @@ export class UserModel {
         if (error) {
           reject(error)
         } else {
-          resolve(row as User)
+          resolve(row as User | null)
         }
       })
     })
@@ -109,7 +109,7 @@ export class UserModel {
     name: string
     email: string
     password: string
-  }): Promise<boolean> {
+  }): Promise<User | null> {
     const userAlreadyExists: boolean = await this.exists({ name: args.name })
 
     if (userAlreadyExists) throw new Error('User already exists')
@@ -120,11 +120,11 @@ export class UserModel {
     const params: string[] = [args.name, args.email, hashedPassword]
 
     return new Promise((resolve, reject) => {
-      DATABASE.run(query, params, error => {
+      DATABASE.get(query, params, (error, row) => {
         if (error) {
           reject(error)
         } else {
-          resolve(true)
+          resolve(row ? (row as User) : null)
         }
       })
     })

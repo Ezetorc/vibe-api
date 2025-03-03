@@ -12,7 +12,7 @@ export declare class LikeModel {
         targetId: number;
         type: 'post' | 'comment';
         userId: number;
-    }): Promise<boolean>;
+    }): Promise<Like | null>;
     static delete(args: {
         id: number;
     }): Promise<boolean>;

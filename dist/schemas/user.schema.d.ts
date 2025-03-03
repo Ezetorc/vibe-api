@@ -4,7 +4,8 @@ export declare const UserSchema: zod.ZodObject<{
     name: zod.ZodString;
     email: zod.ZodString;
     password: zod.ZodString;
-    profile_image_id: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
+    image_id: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
+    image_url: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
     description: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
     created_at: zod.ZodOptional<zod.ZodString>;
 }, "strip", zod.ZodTypeAny, {
@@ -14,7 +15,8 @@ export declare const UserSchema: zod.ZodObject<{
     id?: number | undefined;
     description?: string | null | undefined;
     created_at?: string | undefined;
-    profile_image_id?: string | null | undefined;
+    image_id?: string | null | undefined;
+    image_url?: string | null | undefined;
 }, {
     name: string;
     email: string;
@@ -22,7 +24,8 @@ export declare const UserSchema: zod.ZodObject<{
     id?: number | undefined;
     description?: string | null | undefined;
     created_at?: string | undefined;
-    profile_image_id?: string | null | undefined;
+    image_id?: string | null | undefined;
+    image_url?: string | null | undefined;
 }>;
 export type User = zod.infer<typeof UserSchema>;
 export declare function validateUser(object: any): zod.SafeParseReturnType<{
@@ -32,7 +35,8 @@ export declare function validateUser(object: any): zod.SafeParseReturnType<{
     id?: number | undefined;
     description?: string | null | undefined;
     created_at?: string | undefined;
-    profile_image_id?: string | null | undefined;
+    image_id?: string | null | undefined;
+    image_url?: string | null | undefined;
 }, {
     name: string;
     email: string;
@@ -40,7 +44,8 @@ export declare function validateUser(object: any): zod.SafeParseReturnType<{
     id?: number | undefined;
     description?: string | null | undefined;
     created_at?: string | undefined;
-    profile_image_id?: string | null | undefined;
+    image_id?: string | null | undefined;
+    image_url?: string | null | undefined;
 }>;
 export declare function validatePartialUser(object: any): zod.SafeParseReturnType<{
     name?: string | undefined;
@@ -49,7 +54,8 @@ export declare function validatePartialUser(object: any): zod.SafeParseReturnTyp
     description?: string | null | undefined;
     created_at?: string | undefined;
     password?: string | undefined;
-    profile_image_id?: string | null | undefined;
+    image_id?: string | null | undefined;
+    image_url?: string | null | undefined;
 }, {
     name?: string | undefined;
     id?: number | undefined;
@@ -57,5 +63,6 @@ export declare function validatePartialUser(object: any): zod.SafeParseReturnTyp
     description?: string | null | undefined;
     created_at?: string | undefined;
     password?: string | undefined;
-    profile_image_id?: string | null | undefined;
+    image_id?: string | null | undefined;
+    image_url?: string | null | undefined;
 }>;

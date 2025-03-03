@@ -9,7 +9,7 @@ export declare class CommentModel {
         userId: number;
         postId: number;
         content: string;
-    }): Promise<boolean>;
+    }): Promise<Comment | null>;
     static getById(args: {
         commentId: number;
     }): Promise<Comment>;

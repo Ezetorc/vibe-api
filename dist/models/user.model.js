@@ -99,12 +99,12 @@ export class UserModel {
         const hashedPassword = await bcrypt.hash(args.password, SALT_ROUNDS);
         const params = [args.name, args.email, hashedPassword];
         return new Promise((resolve, reject) => {
-            DATABASE.run(query, params, error => {
+            DATABASE.get(query, params, (error, row) => {
                 if (error) {
                     reject(error);
                 }
                 else {
-                    resolve(true);
+                    resolve(row ? row : null);
                 }
             });
         });

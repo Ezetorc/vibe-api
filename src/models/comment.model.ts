@@ -30,17 +30,29 @@ export class CommentModel {
     userId: number
     postId: number
     content: string
-  }): Promise<boolean> {
+  }): Promise<Comment | null> {
     const query =
       'INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)'
     const params = [args.userId, args.postId, args.content]
 
     return new Promise((resolve, reject) => {
-      DATABASE.run(query, params, error => {
+      DATABASE.run(query, params, function (error) {
         if (error) {
           reject(error)
         } else {
-          resolve(true)
+          const commentId = this.lastID
+
+          DATABASE.get(
+            'SELECT * FROM comments WHERE id = ?',
+            [commentId],
+            (err, row) => {
+              if (err) {
+                reject(err)
+              } else {
+                resolve(row as Comment | null)
+              }
+            }
+          )
         }
       })
     })

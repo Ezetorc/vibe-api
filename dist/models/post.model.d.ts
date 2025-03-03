@@ -11,7 +11,7 @@ export declare class PostModel {
     }): Promise<Post[]>;
     static getById(args: {
         id: number;
-    }): Promise<Post>;
+    }): Promise<Post | null>;
     static create(args: {
         userId: number;
         content: string;

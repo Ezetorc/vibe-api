@@ -34,10 +34,10 @@ export class LikeController {
             userId
         });
         if (!newLikeCreated) {
-            response.status(404).json({ message: 'Error while creating like' });
+            response.status(404).json('Error while creating like');
             return;
         }
-        response.json({ message: 'Like created successfully' });
+        response.json(newLikeCreated);
     }
     static async delete(request, response) {
         const { id } = request.params;

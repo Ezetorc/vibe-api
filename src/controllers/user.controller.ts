@@ -3,6 +3,7 @@ import { User, validatePartialUser } from '../schemas/user.schema.js'
 import { getAccessToken } from '../utilities/getAccessToken.js'
 import { UserModel } from '../models/user.model.js'
 import { SafeParseReturnType } from 'zod'
+import { CLOUDINARY } from '../settings.js'
 import { AccessToken } from '../structures/AccessToken.js'
 
 export class UserController {
@@ -11,6 +12,26 @@ export class UserController {
     const users: User[] = await UserModel.getAll({ amount, page })
 
     response.json(users)
+  }
+
+  static async deleteImage (
+    request: Request,
+    response: Response
+  ): Promise<void> {
+    const { id } = request.params
+
+    if (!id) {
+      response.status(400).json(false)
+      return
+    }
+
+    const result = await CLOUDINARY.uploader.destroy(id as string)
+
+    if (result.result === 'ok') {
+      response.status(200).json(true)
+    } else {
+      response.status(400).json(false)
+    }
   }
 
   static async emailExists (
@@ -42,9 +63,9 @@ export class UserController {
 
   static async getById (request: Request, response: Response): Promise<void> {
     const { id } = request.params
-    const users: User = await UserModel.getById({ id: Number(id) })
+    const user: User | null = await UserModel.getById({ id: Number(id) })
 
-    response.json(users)
+    response.json(user)
   }
 
   static async search (request: Request, response: Response): Promise<void> {
@@ -73,13 +94,13 @@ export class UserController {
       return
     }
 
-    const registered: boolean = await UserModel.register({
+    const registered: User | null = await UserModel.register({
       name,
       email,
       password
     })
 
-    if (!registered) {
+    if (registered === null) {
       response.status(400).json({ message: 'Error when registering' })
       return
     }
@@ -107,7 +128,7 @@ export class UserController {
     })
 
     if (!result.success) {
-      response.status(400).json({ error: "Invalid name or password" })
+      response.status(400).json({ error: 'Invalid name or password' })
       return
     }
 
@@ -159,13 +180,17 @@ export class UserController {
     })
 
     if (!userUpdate) {
-      response
-        .status(404)
-        .json({ message: 'User not found or no changes made' })
+      response.status(404).json({ message: 'No changes made' })
       return
     }
 
-    const updatedUser: User = await UserModel.getById({ id: Number(id) })
+    const updatedUser: User | null = await UserModel.getById({ id: Number(id) })
+
+    if (updatedUser === null) {
+      response.json({ message: 'User not found' })
+      return
+    }
+
     const accessToken: AccessToken = getAccessToken(updatedUser)
 
     response

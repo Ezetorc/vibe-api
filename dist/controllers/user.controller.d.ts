@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 export declare class UserController {
     static getAll(request: Request, response: Response): Promise<void>;
+    static deleteImage(request: Request, response: Response): Promise<void>;
     static emailExists(request: Request, response: Response): Promise<void>;
     static nameExists(request: Request, response: Response): Promise<void>;
     static getByUsername(request: Request, response: Response): Promise<void>;

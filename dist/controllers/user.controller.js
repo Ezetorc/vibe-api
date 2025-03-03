@@ -1,11 +1,26 @@
 import { validatePartialUser } from '../schemas/user.schema.js';
 import { getAccessToken } from '../utilities/getAccessToken.js';
 import { UserModel } from '../models/user.model.js';
+import { CLOUDINARY } from '../settings.js';
 export class UserController {
     static async getAll(request, response) {
         const { amount, page } = request.query;
         const users = await UserModel.getAll({ amount, page });
         response.json(users);
+    }
+    static async deleteImage(request, response) {
+        const { id } = request.params;
+        if (!id) {
+            response.status(400).json(false);
+            return;
+        }
+        const result = await CLOUDINARY.uploader.destroy(id);
+        if (result.result === 'ok') {
+            response.status(200).json(true);
+        }
+        else {
+            response.status(400).json(false);
+        }
     }
     static async emailExists(request, response) {
         const { email } = request.params;
@@ -24,8 +39,8 @@ export class UserController {
     }
     static async getById(request, response) {
         const { id } = request.params;
-        const users = await UserModel.getById({ id: Number(id) });
-        response.json(users);
+        const user = await UserModel.getById({ id: Number(id) });
+        response.json(user);
     }
     static async search(request, response) {
         const { query } = request.params;
@@ -52,7 +67,7 @@ export class UserController {
             email,
             password
         });
-        if (!registered) {
+        if (registered === null) {
             response.status(400).json({ message: 'Error when registering' });
             return;
         }
@@ -74,7 +89,7 @@ export class UserController {
             password
         });
         if (!result.success) {
-            response.status(400).json({ error: "Invalid name or password" });
+            response.status(400).json({ error: 'Invalid name or password' });
             return;
         }
         const user = await UserModel.login({ name, password });
@@ -111,12 +126,14 @@ export class UserController {
             object: result.data
         });
         if (!userUpdate) {
-            response
-                .status(404)
-                .json({ message: 'User not found or no changes made' });
+            response.status(404).json({ message: 'No changes made' });
             return;
         }
         const updatedUser = await UserModel.getById({ id: Number(id) });
+        if (updatedUser === null) {
+            response.json({ message: 'User not found' });
+            return;
+        }
         const accessToken = getAccessToken(updatedUser);
         response
             .cookie('access_token', accessToken.token, accessToken.config)

@@ -14,23 +14,23 @@ export class CommentController {
     const isNewCommentValid = validateComment(request.body)
 
     if (!isNewCommentValid.success) {
-      response.status(400).json({ error: isNewCommentValid.error })
+      response.status(400).json(isNewCommentValid.error)
       return
     }
 
     const { post_id: postId, content, user_id: userId } = isNewCommentValid.data
-    const newCommentCreated: boolean = await CommentModel.create({
+    const newComment: Comment | null = await CommentModel.create({
       content,
       postId,
       userId
     })
 
-    if (!newCommentCreated) {
-      response.status(404).json({ message: 'Error while creating comment' })
+    if (newComment == null) {
+      response.status(404).json(null)
       return
     }
 
-    response.json({ message: 'Comment created successfully' })
+    response.json(newComment)
   }
 
   static async delete (request: Request, response: Response): Promise<void> {

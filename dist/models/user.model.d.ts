@@ -7,7 +7,7 @@ export declare class UserModel {
     }): Promise<User[]>;
     static getById(args: {
         id: number;
-    }): Promise<User>;
+    }): Promise<User | null>;
     static getByName(args: {
         name: string;
     }): Promise<User | null>;
@@ -24,7 +24,7 @@ export declare class UserModel {
         name: string;
         email: string;
         password: string;
-    }): Promise<boolean>;
+    }): Promise<User | null>;
     static login(args: {
         name: string;
         password: string;

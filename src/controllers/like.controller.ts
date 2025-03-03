@@ -52,18 +52,18 @@ export class LikeController {
     }
 
     const { target_id: targetId, type, user_id: userId } = isNewLikeValid.data
-    const newLikeCreated: boolean = await LikeModel.create({
+    const newLikeCreated: Like | null = await LikeModel.create({
       targetId,
       type,
       userId
     })
 
     if (!newLikeCreated) {
-      response.status(404).json({ message: 'Error while creating like' })
+      response.status(404).json('Error while creating like')
       return
     }
 
-    response.json({ message: 'Like created successfully' })
+    response.json(newLikeCreated)
   }
 
   static async delete (request: Request, response: Response): Promise<void> {

@@ -46,7 +46,7 @@ export class PostModel {
     })
   }
 
-  static async getById (args: { id: number }): Promise<Post> {
+  static async getById (args: { id: number }): Promise<Post | null> {
     const query: string = 'SELECT * FROM posts WHERE id = ?'
     const params: number[] = [args.id]
 
@@ -55,7 +55,7 @@ export class PostModel {
         if (error) {
           reject(error)
         } else {
-          resolve(row as Post)
+          resolve(row as Post | null)
         }
       })
     })
