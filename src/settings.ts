@@ -1,10 +1,13 @@
 import { config as dotenvConfig } from 'dotenv'
 dotenvConfig()
 
-import mysql from 'mysql2'
-import cloudinary from 'cloudinary'
+console.log('🔍 Variables de entorno disponibles:', process.env)
 
 const envData = process.env
+console.log('2 🔍 MYSQL_PUBLIC_URL:', envData.MYSQL_PUBLIC_URL)
+
+import mysql from 'mysql2'
+import cloudinary from 'cloudinary'
 
 cloudinary.v2.config({
   cloud_name: envData.CLOUD_NAME,
@@ -17,9 +20,12 @@ export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
 export const SECRET_KEY: string = envData.SECRET_KEY || 'default_key'
 export const CLOUDINARY = cloudinary.v2
 
-console.log("ALTOOO -> ", envData.MYSQL_PUBLIC_URL)
+const mysqlUrl =
+  process.env.MYSQL_PUBLIC_URL || 'mysql://root:password@host:port/database'
 
-const mysqlConnection = mysql.createConnection(envData.MYSQL_PUBLIC_URL!)
+console.log('1 🔍 MYSQL_PUBLIC_URL:', mysqlUrl)
+
+const mysqlConnection = mysql.createConnection(mysqlUrl)
 
 mysqlConnection.connect(error => {
   if (error) {
