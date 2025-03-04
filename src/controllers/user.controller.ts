@@ -90,7 +90,7 @@ export class UserController {
     })
 
     if (result.error) {
-      response.status(400).json({ error: JSON.parse(result.error.message) })
+      response.status(400).json(false)
       return
     }
 
@@ -101,14 +101,14 @@ export class UserController {
     })
 
     if (registered === null) {
-      response.status(400).json({ message: 'Error when registering' })
+      response.status(400).json(false)
       return
     }
 
     const registeredUser: User | null = await UserModel.getByName({ name })
 
     if (!registeredUser) {
-      response.status(400).json({ message: 'User not found' })
+      response.status(400).json(false)
       return
     }
 
@@ -117,7 +117,7 @@ export class UserController {
     response
       .cookie('access_token', accessToken.token, accessToken.config)
       .status(201)
-      .json({ success: true, id: registeredUser.id })
+      .json(true)
   }
 
   static async login (request: Request, response: Response): Promise<void> {
