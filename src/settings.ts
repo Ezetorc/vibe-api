@@ -17,19 +17,15 @@ export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
 export const SECRET_KEY: string = envData.SECRET_KEY || 'default_key'
 export const CLOUDINARY = cloudinary.v2
 
-const mysqlConnection = mysql.createConnection({
-  host: envData.MYSQL_HOST,
-  user: envData.MYSQL_USER,
-  password: envData.MYSQL_PASSWORD,
-  database: envData.MYSQL_DATABASE,
-  port: Number(envData.MYSQL_PORT) || 3306
-})
+console.log("ALTOOO -> ", envData.MYSQL_PUBLIC_URL)
+
+const mysqlConnection = mysql.createConnection(envData.MYSQL_PUBLIC_URL!)
 
 mysqlConnection.connect(error => {
   if (error) {
-    console.error('MySQL Connection error: ', error)
+    console.error('❌ MySQL Connection error: ', error)
   } else {
-    console.log('MySQL Connection successful')
+    console.log('✅ MySQL Connection successful')
   }
 })
 
