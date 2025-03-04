@@ -1,13 +1,11 @@
 import { config as dotenvConfig } from 'dotenv'
-dotenvConfig()
-
-console.log('🔍 Variables de entorno disponibles:', process.env)
-
-const envData = process.env
-console.log('2 🔍 MYSQL_PUBLIC_URL:', envData.MYSQL_PUBLIC_URL)
-
 import mysql from 'mysql2'
 import cloudinary from 'cloudinary'
+dotenvConfig()
+const envData = process.env
+
+console.log('🔍 Variables de entorno disponibles:', envData)
+console.log('2 🔍 MYSQL_PUBLIC_URL:', envData.MYSQL_PUBLIC_URL)
 
 cloudinary.v2.config({
   cloud_name: envData.CLOUD_NAME,

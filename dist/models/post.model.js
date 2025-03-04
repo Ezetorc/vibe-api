@@ -9,7 +9,7 @@ export class PostModel {
             params: []
         });
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
@@ -27,7 +27,7 @@ export class PostModel {
             ? [`%${args.query}%`, args.userId]
             : [`%${args.query}%`];
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
@@ -41,12 +41,12 @@ export class PostModel {
         const query = 'SELECT * FROM posts WHERE id = ?';
         const params = [args.id];
         return new Promise((resolve, reject) => {
-            DATABASE.get(query, params, (error, row) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
                 else {
-                    resolve(row);
+                    resolve(rows[0]);
                 }
             });
         });
@@ -55,7 +55,7 @@ export class PostModel {
         const query = 'INSERT INTO posts (user_id, content) VALUES (?, ?)';
         const params = [args.userId, args.content];
         return new Promise((resolve, reject) => {
-            DATABASE.run(query, params, error => {
+            DATABASE.query(query, params, error => {
                 if (error) {
                     reject(error);
                 }
@@ -69,7 +69,7 @@ export class PostModel {
         return new Promise((resolve, reject) => {
             const query = 'DELETE FROM posts WHERE id = ?';
             const params = [args.id];
-            DATABASE.run(query, params, error => {
+            DATABASE.query(query, params, error => {
                 if (error) {
                     reject(error);
                 }
@@ -92,7 +92,7 @@ export class PostModel {
                 .join(', ');
             const query = `UPDATE posts SET ${clause} WHERE id = ?`;
             const params = [...Object.values(args.object), args.id];
-            DATABASE.run(query, params, error => {
+            DATABASE.query(query, params, error => {
                 if (error) {
                     reject(error);
                 }

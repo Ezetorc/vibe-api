@@ -12,10 +12,8 @@ export declare class UserModel {
         name: string;
     }): Promise<User | null>;
     static exists(args: {
-        name: string;
-    }): Promise<boolean>;
-    static exists(args: {
-        email: string;
+        name?: string;
+        email?: string;
     }): Promise<boolean>;
     static search(args: {
         query: string;

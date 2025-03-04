@@ -9,7 +9,7 @@ export class CommentModel {
             params: []
         });
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
@@ -23,18 +23,18 @@ export class CommentModel {
         const query = 'INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)';
         const params = [args.userId, args.postId, args.content];
         return new Promise((resolve, reject) => {
-            DATABASE.run(query, params, function (error) {
+            DATABASE.query(query, params, function (error, result) {
                 if (error) {
                     reject(error);
                 }
                 else {
-                    const commentId = this.lastID;
-                    DATABASE.get('SELECT * FROM comments WHERE id = ?', [commentId], (err, row) => {
-                        if (err) {
-                            reject(err);
+                    const commentId = result.insertId;
+                    DATABASE.query('SELECT * FROM comments WHERE id = ?', [commentId], (error, rows) => {
+                        if (error) {
+                            reject(error);
                         }
                         else {
-                            resolve(row);
+                            resolve(rows[0]);
                         }
                     });
                 }
@@ -45,12 +45,12 @@ export class CommentModel {
         const query = 'SELECT * FROM comments WHERE id = ?';
         const params = [args.commentId];
         return new Promise((resolve, reject) => {
-            DATABASE.get(query, params, (error, row) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
                 else {
-                    resolve(row);
+                    resolve(rows[0]);
                 }
             });
         });
@@ -59,7 +59,7 @@ export class CommentModel {
         return new Promise((resolve, reject) => {
             const query = 'DELETE FROM comments WHERE id = ?';
             const params = [args.commentId];
-            DATABASE.run(query, params, error => {
+            DATABASE.query(query, params, error => {
                 if (error) {
                     reject(error);
                 }
@@ -73,7 +73,7 @@ export class CommentModel {
         const query = 'SELECT * FROM comments WHERE post_id = ?';
         const params = [args.postId];
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }

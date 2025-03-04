@@ -4,7 +4,7 @@ export class LikeModel {
         const query = 'SELECT * FROM likes WHERE target_id = ? AND type = ?';
         const params = [args.postId, 'post'];
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
@@ -18,7 +18,7 @@ export class LikeModel {
         const query = 'SELECT * FROM likes WHERE target_id = ? AND type = ?';
         const params = [Number(args.commentId), 'comment'];
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
@@ -32,7 +32,7 @@ export class LikeModel {
         const query = 'SELECT * FROM likes WHERE type = ?';
         const params = ['post'];
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
@@ -46,7 +46,7 @@ export class LikeModel {
         const query = 'SELECT * FROM likes WHERE type = ?';
         const params = ['comment'];
         return new Promise((resolve, reject) => {
-            DATABASE.all(query, params, (error, rows) => {
+            DATABASE.query(query, params, (error, rows) => {
                 if (error) {
                     reject(error);
                 }
@@ -60,18 +60,18 @@ export class LikeModel {
         const query = 'INSERT INTO likes (target_id, type, user_id) VALUES (?, ?, ?)';
         const params = [args.targetId, args.type, args.userId];
         return new Promise((resolve, reject) => {
-            DATABASE.run(query, params, function (error) {
+            DATABASE.query(query, params, (error, result) => {
                 if (error) {
                     reject(error);
                 }
                 else {
-                    const likeId = this.lastID;
-                    DATABASE.get('SELECT * FROM likes WHERE id = ?', [likeId], (err, row) => {
+                    const likeId = result.insertId;
+                    DATABASE.query('SELECT * FROM likes WHERE id = ?', [likeId], (err, row) => {
                         if (err) {
                             reject(err);
                         }
                         else {
-                            resolve(row);
+                            resolve(row || null);
                         }
                     });
                 }
@@ -82,7 +82,7 @@ export class LikeModel {
         return new Promise((resolve, reject) => {
             const query = 'DELETE FROM likes WHERE id = ?';
             const params = [args.id];
-            DATABASE.run(query, params, error => {
+            DATABASE.query(query, params, error => {
                 if (error) {
                     reject(error);
                 }

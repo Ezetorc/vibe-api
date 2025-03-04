@@ -52,8 +52,8 @@ export declare function validatePartialUser(object: any): zod.SafeParseReturnTyp
     id?: number | undefined;
     email?: string | undefined;
     description?: string | null | undefined;
-    created_at?: string | undefined;
     password?: string | undefined;
+    created_at?: string | undefined;
     image_id?: string | null | undefined;
     image_url?: string | null | undefined;
 }, {
@@ -61,8 +61,8 @@ export declare function validatePartialUser(object: any): zod.SafeParseReturnTyp
     id?: number | undefined;
     email?: string | undefined;
     description?: string | null | undefined;
-    created_at?: string | undefined;
     password?: string | undefined;
+    created_at?: string | undefined;
     image_id?: string | null | undefined;
     image_url?: string | null | undefined;
 }>;
