@@ -21,5 +21,5 @@ app
   .use('/followers', FollowerRouter)
   .use('/comments', CommentRouter)
   .listen(PORT, () =>
-    console.log(`Vibe API listening on port http://localhost:${PORT}/`)
+    console.log(`-> Vibe API listening on port http://localhost:${PORT}/`)
   )

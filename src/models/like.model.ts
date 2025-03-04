@@ -7,7 +7,7 @@ export class LikeModel {
     const params = [args.postId, 'post']
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -22,7 +22,7 @@ export class LikeModel {
     const params = [Number(args.commentId), 'comment']
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -37,7 +37,7 @@ export class LikeModel {
     const params = ['post']
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -52,7 +52,7 @@ export class LikeModel {
     const params = ['comment']
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -72,20 +72,20 @@ export class LikeModel {
     const params = [args.targetId, args.type, args.userId]
 
     return new Promise((resolve, reject) => {
-      DATABASE.run(query, params, function (error) {
+      DATABASE.query(query, params, (error, result) => {
         if (error) {
           reject(error)
         } else {
-          const likeId = this.lastID
+          const likeId = (result as any).insertId
 
-          DATABASE.get(
+          DATABASE.query(
             'SELECT * FROM likes WHERE id = ?',
             [likeId],
             (err, row) => {
               if (err) {
                 reject(err)
               } else {
-                resolve(row as Like | null)
+                resolve((row as unknown as Like) || null)
               }
             }
           )
@@ -99,7 +99,7 @@ export class LikeModel {
       const query: string = 'DELETE FROM likes WHERE id = ?'
       const params = [args.id]
 
-      DATABASE.run(query, params, error => {
+      DATABASE.query(query, params, error => {
         if (error) {
           reject(error)
         } else {
