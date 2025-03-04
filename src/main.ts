@@ -15,7 +15,7 @@ app
   .use(cookieMiddleware())
   .use(
     corsMiddleware({
-      origin: 'https://vibe-page.vercel.app',
+      origin: true,
       credentials: true
     })
   )
@@ -25,6 +25,4 @@ app
   .use('/likes', LikeRouter)
   .use('/followers', FollowerRouter)
   .use('/comments', CommentRouter)
-  .listen(PORT, () =>
-    console.log(`-> Vibe API listening on port http://localhost:${PORT}/`)
-  )
+  .listen(PORT)
