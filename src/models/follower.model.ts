@@ -1,3 +1,4 @@
+import { RowDataPacket } from 'mysql2'
 import { Follower } from '../schemas/follower.schema.js'
 import { DATABASE } from '../settings.js'
 
@@ -7,7 +8,7 @@ export class FollowerModel {
     const params: string[] = []
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -25,7 +26,7 @@ export class FollowerModel {
     const params = [args.userId]
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows: Follower[]) => {
+      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
         if (error) {
           reject(error)
         } else {
@@ -41,7 +42,7 @@ export class FollowerModel {
     const params = [args.userId]
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows: Follower[]) => {
+      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
         if (error) {
           reject(error)
         } else {
@@ -60,7 +61,7 @@ export class FollowerModel {
     const params = [args.followerId, args.followingId]
 
     return new Promise((resolve, reject) => {
-      DATABASE.run(query, params, error => {
+      DATABASE.query(query, params, error => {
         if (error) {
           reject(error)
         } else {
@@ -79,7 +80,7 @@ export class FollowerModel {
     const params = [args.followerId, args.followingId]
 
     return new Promise((resolve, reject) => {
-      DATABASE.run(query, params, function (error) {
+      DATABASE.query(query, params, function (error) {
         if (error) {
           reject(error)
         } else {

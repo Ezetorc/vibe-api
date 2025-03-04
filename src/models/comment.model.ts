@@ -1,3 +1,4 @@
+import { ResultSetHeader, RowDataPacket } from 'mysql2'
 import { Comment } from '../schemas/comment.schema.js'
 import { DATABASE } from '../settings.js'
 import { Query } from '../structures/Query.js'
@@ -16,7 +17,7 @@ export class CommentModel {
     })
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -36,20 +37,20 @@ export class CommentModel {
     const params = [args.userId, args.postId, args.content]
 
     return new Promise((resolve, reject) => {
-      DATABASE.run(query, params, function (error) {
+      DATABASE.query(query, params, function (error, result: ResultSetHeader) {
         if (error) {
           reject(error)
         } else {
-          const commentId = this.lastID
+          const commentId = result.insertId
 
-          DATABASE.get(
+          DATABASE.query(
             'SELECT * FROM comments WHERE id = ?',
             [commentId],
-            (err, row) => {
-              if (err) {
-                reject(err)
+            (error, rows: RowDataPacket[]) => {
+              if (error) {
+                reject(error)
               } else {
-                resolve(row as Comment | null)
+                resolve(rows[0] as Comment | null)
               }
             }
           )
@@ -63,11 +64,11 @@ export class CommentModel {
     const params = [args.commentId]
 
     return new Promise((resolve, reject) => {
-      DATABASE.get(query, params, (error, row) => {
+      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
         if (error) {
           reject(error)
         } else {
-          resolve(row as Comment)
+          resolve(rows[0] as Comment)
         }
       })
     })
@@ -78,7 +79,7 @@ export class CommentModel {
       const query: string = 'DELETE FROM comments WHERE id = ?'
       const params = [args.commentId]
 
-      DATABASE.run(query, params, error => {
+      DATABASE.query(query, params, error => {
         if (error) {
           reject(error)
         } else {
@@ -93,7 +94,7 @@ export class CommentModel {
     const params = [args.postId]
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {

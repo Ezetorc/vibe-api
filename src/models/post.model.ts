@@ -1,3 +1,4 @@
+import { RowDataPacket } from 'mysql2';
 import { Post } from '../schemas/post.schema.js'
 import { DATABASE } from '../settings.js'
 import { Query } from '../structures/Query.js'
@@ -13,7 +14,7 @@ export class PostModel {
     })
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -36,7 +37,7 @@ export class PostModel {
       : [`%${args.query}%`]
 
     return new Promise((resolve, reject) => {
-      DATABASE.all(query, params, (error, rows) => {
+      DATABASE.query(query, params, (error, rows) => {
         if (error) {
           reject(error)
         } else {
@@ -51,11 +52,11 @@ export class PostModel {
     const params: number[] = [args.id]
 
     return new Promise((resolve, reject) => {
-      DATABASE.get(query, params, (error, row) => {
+      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
         if (error) {
           reject(error)
         } else {
-          resolve(row as Post | null)
+          resolve(rows[0] as Post | null)
         }
       })
     })
@@ -69,7 +70,7 @@ export class PostModel {
     const params = [args.userId, args.content]
 
     return new Promise((resolve, reject) => {
-      DATABASE.run(query, params, error => {
+      DATABASE.query(query, params, error => {
         if (error) {
           reject(error)
         } else {
@@ -84,7 +85,7 @@ export class PostModel {
       const query: string = 'DELETE FROM posts WHERE id = ?'
       const params: number[] = [args.id]
 
-      DATABASE.run(query, params, error => {
+      DATABASE.query(query, params, error => {
         if (error) {
           reject(error)
         } else {
@@ -113,7 +114,7 @@ export class PostModel {
       const query: string = `UPDATE posts SET ${clause} WHERE id = ?`
       const params = [...Object.values(args.object), args.id]
 
-      DATABASE.run(query, params, error => {
+      DATABASE.query(query, params, error => {
         if (error) {
           reject(error)
         } else {
