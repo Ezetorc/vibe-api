@@ -1,10 +1,10 @@
 import { User } from '../schemas/user.schema.js'
 import { SECRET_KEY } from '../settings.js'
-import jwt, { JwtPayload } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import { AccessToken } from '../structures/AccessToken.js'
 
 export function getAccessToken (user: User): AccessToken {
-  const payload: JwtPayload = {
+  const payload: jwt.JwtPayload = {
     user: {
       id: user.id
     }

@@ -1,5 +1,5 @@
 import { SECRET_KEY } from '../settings.js';
-import { sign } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 export function getAccessToken(user) {
     const payload = {
         user: {
@@ -7,7 +7,7 @@ export function getAccessToken(user) {
         }
     };
     return {
-        token: sign(payload, SECRET_KEY, { expiresIn: '24h' }),
+        token: jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' }),
         config: {
             httpOnly: true,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
