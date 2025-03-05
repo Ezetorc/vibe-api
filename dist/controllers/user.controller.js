@@ -59,7 +59,7 @@ export class UserController {
             password
         });
         if (result.error) {
-            response.status(400).json({ error: JSON.parse(result.error.message) });
+            response.status(400).json(false);
             return;
         }
         const registered = await UserModel.register({
@@ -68,19 +68,19 @@ export class UserController {
             password
         });
         if (registered === null) {
-            response.status(400).json({ message: 'Error when registering' });
+            response.status(400).json(false);
             return;
         }
         const registeredUser = await UserModel.getByName({ name });
         if (!registeredUser) {
-            response.status(400).json({ message: 'User not found' });
+            response.status(400).json(false);
             return;
         }
         const accessToken = getAccessToken(registeredUser);
         response
             .cookie('access_token', accessToken.token, accessToken.config)
             .status(201)
-            .json({ success: true, id: registeredUser.id });
+            .json(true);
     }
     static async login(request, response) {
         const { name, password } = request.body;

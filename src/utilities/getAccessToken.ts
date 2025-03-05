@@ -1,6 +1,6 @@
 import { User } from '../schemas/user.schema.js'
 import { SECRET_KEY } from '../settings.js'
-import jwt, { JwtPayload } from 'jsonwebtoken'
+import { JwtPayload, sign } from 'jsonwebtoken'
 import { AccessToken } from '../structures/AccessToken.js'
 
 export function getAccessToken (user: User): AccessToken {
@@ -11,7 +11,7 @@ export function getAccessToken (user: User): AccessToken {
   }
 
   return {
-    token: jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' }),
+    token: sign(payload, SECRET_KEY, { expiresIn: '24h' }),
     config: {
       httpOnly: true,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',

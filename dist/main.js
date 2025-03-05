@@ -11,11 +11,14 @@ const app = express();
 app
     .disable('x-powered-by')
     .use(cookieMiddleware())
-    .use(corsMiddleware({ origin: 'http://localhost:8888', credentials: true }))
+    .use(corsMiddleware({
+    origin: 'https://vibe-page.vercel.app',
+    credentials: true
+}))
     .use(jsonMiddleware())
     .use('/users', UserRouter)
     .use('/posts', PostRouter)
     .use('/likes', LikeRouter)
     .use('/followers', FollowerRouter)
     .use('/comments', CommentRouter)
-    .listen(PORT, () => console.log(`-> Vibe API listening on port http://localhost:${PORT}/`));
+    .listen(PORT);
