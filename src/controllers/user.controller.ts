@@ -128,14 +128,14 @@ export class UserController {
     })
 
     if (!result.success) {
-      response.status(400).json({ error: 'Invalid name or password' })
+      response.status(400).json(false)
       return
     }
 
     const user: User | null = await UserModel.login({ name, password })
 
     if (!user) {
-      response.json({ success: false })
+      response.json(false)
       return
     }
 
@@ -143,7 +143,7 @@ export class UserController {
 
     response
       .cookie('access_token', accessToken.token, accessToken.config)
-      .json({ success: true, user })
+      .json(true)
   }
 
   static async logout (_request: Request, response: Response): Promise<void> {
