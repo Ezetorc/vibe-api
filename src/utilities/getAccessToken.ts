@@ -12,7 +12,8 @@ export function getAccessToken (user: User): AccessToken {
 
   return {
     token: jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' }),
-    config: {
+    config: { 
+      
       httpOnly: false,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       secure: process.env.NODE_ENV === 'production',

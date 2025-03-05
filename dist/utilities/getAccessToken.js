@@ -9,7 +9,7 @@ export function getAccessToken(user) {
     return {
         token: jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' }),
         config: {
-            httpOnly: true,
+            httpOnly: false,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             secure: process.env.NODE_ENV === 'production',
             maxAge: 24 * 60 * 60 * 1000
