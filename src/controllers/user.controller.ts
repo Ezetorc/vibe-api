@@ -140,7 +140,6 @@ export class UserController {
     }
 
     const accessToken: AccessToken = getAccessToken(user)
-
     response
       .cookie('access_token', accessToken.token, accessToken.config)
       .json(true)
