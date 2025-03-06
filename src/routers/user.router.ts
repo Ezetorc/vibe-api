@@ -1,21 +1,24 @@
 import { Router } from 'express'
 import { UserController } from '../controllers/user.controller.js'
-import { tokenMiddleware } from '../middlewares/token.middleware.js'
+import { sessionMiddleware } from '../middlewares/session.middleware.js'
 
 export const UserRouter = Router()
 
+// GET
+UserRouter.get('/all', UserController.getAll)
+UserRouter.get('/search', UserController.search)
+UserRouter.get('/id', UserController.getById)
+UserRouter.get('/name', UserController.getByName)
+UserRouter.get('/email', UserController.getByEmail)
+
+// POST
 UserRouter.post('/register', UserController.register)
 UserRouter.post('/login', UserController.login)
-UserRouter.post('/logout', tokenMiddleware, UserController.logout)
-UserRouter.post('/image/:id', UserController.deleteImage)
+UserRouter.post('/logout', sessionMiddleware, UserController.logout)
+UserRouter.post('/image', UserController.deleteImage)
 
-UserRouter.get('/search/:query', UserController.search)
-UserRouter.get('/', UserController.getAll)
-UserRouter.get('/id/:id', UserController.getById)
-UserRouter.get('/username/:username', UserController.getByUsername)
-UserRouter.get('/emailExists/:email', UserController.emailExists)
-UserRouter.get('/nameExists/:name', UserController.nameExists)
+// DELETE
+UserRouter.delete('/id', sessionMiddleware, UserController.delete)
 
-UserRouter.delete('/id/:id', tokenMiddleware, UserController.delete)
-
-UserRouter.patch('/id/:id', tokenMiddleware, UserController.update)
+// PATCH
+UserRouter.patch('/id', sessionMiddleware, UserController.update)

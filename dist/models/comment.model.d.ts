@@ -12,7 +12,7 @@ export declare class CommentModel {
     }): Promise<Comment | null>;
     static getById(args: {
         commentId: number;
-    }): Promise<Comment>;
+    }): Promise<Comment | null>;
     static delete(args: {
         commentId: number;
     }): Promise<boolean>;

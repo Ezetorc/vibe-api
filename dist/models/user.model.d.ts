@@ -11,10 +11,9 @@ export declare class UserModel {
     static getByName(args: {
         name: string;
     }): Promise<User | null>;
-    static exists(args: {
-        name?: string;
-        email?: string;
-    }): Promise<boolean>;
+    static getByEmail(args: {
+        email: string;
+    }): Promise<User | null>;
     static search(args: {
         query: string;
     }): Promise<User[]>;

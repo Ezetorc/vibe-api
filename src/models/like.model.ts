@@ -1,65 +1,67 @@
 import { Like } from '../schemas/like.schema.js'
-import { DATABASE } from '../settings.js'
+import { ResultSetHeader } from 'mysql2'
+import { execute } from '../utilities/execute.js'
 
 export class LikeModel {
   static async getAllOfPost (args: { postId: number }): Promise<Like[]> {
     const query: string = 'SELECT * FROM likes WHERE target_id = ? AND type = ?'
     const params = [args.postId, 'post']
+    const { failed, rows } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Like[])
-        }
-      })
-    })
+    if (failed) {
+      return []
+    } else {
+      return rows as Like[]
+    }
   }
 
   static async getAllOfComment (args: { commentId: number }): Promise<Like[]> {
     const query: string = 'SELECT * FROM likes WHERE target_id = ? AND type = ?'
     const params = [Number(args.commentId), 'comment']
+    const { failed, rows } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Like[])
-        }
-      })
-    })
+    if (failed) {
+      return []
+    } else {
+      return rows as Like[]
+    }
   }
 
   static async getAllOfPosts (): Promise<Like[]> {
     const query: string = 'SELECT * FROM likes WHERE type = ?'
     const params = ['post']
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Like[])
-        }
-      })
-    })
+    const { failed, rows } = await execute(query, params)
+
+    if (failed) {
+      return []
+    } else {
+      return rows as Like[]
+    }
   }
 
   static async getAllOfComments (): Promise<Like[]> {
     const query: string = 'SELECT * FROM likes WHERE type = ?'
     const params = ['comment']
+    const { failed, rows } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Like[])
-        }
-      })
-    })
+    if (failed) {
+      return []
+    } else {
+      return rows as Like[]
+    }
+  }
+
+  static async getById (args: { id: number }): Promise<Like | null> {
+    const query = 'SELECT * FROM likes WHERE id = ?'
+    const params = [args.id]
+    const { error, rows } = await execute(query, params)
+
+    if (error) {
+      return null
+    } else {
+      return rows.length > 0 ? (rows[0] as Like) : null
+    }
   }
 
   static async create (args: {
@@ -70,42 +72,24 @@ export class LikeModel {
     const query =
       'INSERT INTO likes (target_id, type, user_id) VALUES (?, ?, ?)'
     const params = [args.targetId, args.type, args.userId]
+    const { failed, rows: result } = await execute<ResultSetHeader>(
+      query,
+      params
+    )
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, result) => {
-        if (error) {
-          reject(error)
-        } else {
-          const likeId = (result as any).insertId
-
-          DATABASE.query(
-            'SELECT * FROM likes WHERE id = ?',
-            [likeId],
-            (err, row) => {
-              if (err) {
-                reject(err)
-              } else {
-                resolve((row as unknown as Like) || null)
-              }
-            }
-          )
-        }
-      })
-    })
+    if (failed) {
+      return null
+    } else {
+      const like: Like | null = await this.getById({ id: result.insertId })
+      return like
+    }
   }
 
   static async delete (args: { id: number }): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const query: string = 'DELETE FROM likes WHERE id = ?'
-      const params = [args.id]
-
-      DATABASE.query(query, params, error => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    const query: string = 'DELETE FROM likes WHERE id = ?'
+    const params = [args.id]
+    const { failed } = await execute(query, params)
+    
+    return !failed
   }
 }

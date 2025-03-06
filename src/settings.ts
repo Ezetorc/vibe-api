@@ -10,13 +10,7 @@ cloudinary.v2.config({
   api_secret: envData.CLOUD_API_SECRET
 })
 
-export const PORT: number = Number(envData.PORT) || 3000
-export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
-export const SECRET_KEY: string = envData.SECRET_KEY || 'default_key'
-export const CLOUDINARY = cloudinary.v2
-
 const mysqlConnection = mysql.createConnection(envData.MYSQL_PUBLIC_URL!)
-
 mysqlConnection.connect(error => {
   if (error) {
     console.error('❌ MySQL Connection error: ', error)
@@ -25,4 +19,12 @@ mysqlConnection.connect(error => {
   }
 })
 
+export const PORT: number = Number(envData.PORT) || 3000
+export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
+export const SECRET_KEY: string = envData.SECRET_KEY || 'default_key'
+export const CLOUDINARY = cloudinary.v2
 export const DATABASE = mysqlConnection
+export const COOKIES = {
+  SESSION: 'sesion'
+}
+export const NODE_ENV = envData.NODE_ENV

@@ -1,9 +1,10 @@
 import { User } from '../schemas/user.schema.js'
-import { DATABASE, SALT_ROUNDS } from '../settings.js'
+import { SALT_ROUNDS } from '../settings.js'
 import bcrypt from 'bcrypt'
 import { Query } from '../structures/Query.js'
 import { getDataByAmount } from '../utilities/getDataByAmount.js'
-import { RowDataPacket, ResultSetHeader } from 'mysql2'
+import { ResultSetHeader } from 'mysql2'
+import { execute } from '../utilities/execute.js'
 
 export class UserModel {
   static async getAll (args: { amount?: Query; page?: Query }): Promise<User[]> {
@@ -14,76 +15,62 @@ export class UserModel {
       params: []
     })
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
-        if (error) reject(error)
-        else resolve(rows as User[])
-      })
-    })
+    const { rows, failed } = await execute(query, params)
+
+    if (failed) {
+      return []
+    } else {
+      return rows as User[]
+    }
   }
 
   static async getById (args: { id: number }): Promise<User | null> {
-    return new Promise((resolve, reject) => {
-      DATABASE.query(
-        'SELECT * FROM users WHERE id = ?',
-        [args.id],
-        (error, rows: RowDataPacket[]) => {
-          if (error) reject(error)
-          else resolve(rows.length > 0 ? (rows[0] as User) : null)
-        }
-      )
-    })
+    const query = 'SELECT * FROM users WHERE id = ?'
+    const params = [args.id]
+    const { failed, rows } = await execute(query, params)
+
+    if (failed) {
+      return null
+    } else {
+      return rows.length > 0 ? (rows[0] as User) : null
+    }
   }
 
   static async getByName (args: { name: string }): Promise<User | null> {
-    return new Promise((resolve, reject) => {
-      DATABASE.query(
-        'SELECT * FROM users WHERE name = ?',
-        [args.name],
-        (error, rows: RowDataPacket[]) => {
-          if (error) reject(error)
-          else resolve(rows.length > 0 ? (rows[0] as User) : null)
-        }
-      )
-    })
+    const query = 'SELECT * FROM users WHERE name = ?'
+    const params = [args.name]
+    const { error, rows } = await execute(query, params)
+
+    if (error) {
+      return null
+    } else {
+      return rows.length > 0 ? (rows[0] as User) : null
+    }
   }
 
-  static async exists (args: {
-    name?: string
-    email?: string
-  }): Promise<boolean> {
-    let query = ''
-    let params: string[] = []
+  static async getByEmail (args: { email: string }): Promise<User | null> {
+    const query = 'SELECT * FROM users WHERE email = ?'
+    const params = [args.email]
+    const { error, rows } = await execute(query, params)
 
-    if (args.name) {
-      query = 'SELECT 1 FROM users WHERE name = ?'
-      params = [args.name]
-    } else if (args.email) {
-      query = 'SELECT 1 FROM users WHERE email = ?'
-      params = [args.email]
+    if (error) {
+      return null
     } else {
-      return false
+      return rows.length > 0 ? (rows[0] as User) : null
     }
-
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
-        if (error) reject(error)
-        else resolve(rows.length > 0)
-      })
-    })
   }
 
   static async search (args: { query: string }): Promise<User[]> {
     const query =
       'SELECT * FROM users WHERE name LIKE ? OR email LIKE ? OR description LIKE ?'
     const params = [`%${args.query}%`, `%${args.query}%`, `%${args.query}%`]
+    const { rows, failed } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
-        if (error) reject(error)
-        else resolve(rows as User[])
-      })
-    })
+    if (failed) {
+      return []
+    } else {
+      return rows as User[]
+    }
   }
 
   static async register (args: {
@@ -91,57 +78,57 @@ export class UserModel {
     email: string
     password: string
   }): Promise<User | null> {
-    const userAlreadyExists = await this.exists({ name: args.name })
-    if (userAlreadyExists) throw new Error('User already exists')
+    const user: User | null = await this.getByName({ name: args.name })
+    const userExists: boolean = Boolean(user)
 
-    const hashedPassword = await bcrypt.hash(args.password, SALT_ROUNDS)
+    if (userExists) return null
+
+    const hashedPassword: string = await bcrypt.hash(args.password, SALT_ROUNDS)
     const query = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)'
     const params = [args.name, args.email, hashedPassword]
+    const { error, rows: result } = await execute<ResultSetHeader>(
+      query,
+      params
+    )
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, function (error, result: ResultSetHeader) {
-        if (error) reject(error)
-        else {
-          DATABASE.query(
-            'SELECT * FROM users WHERE id = ?',
-            [result.insertId],
-            (err, rows: RowDataPacket[]) => {
-              if (err) reject(err)
-              else resolve(rows.length > 0 ? (rows[0] as User) : null)
-            }
-          )
-        }
-      })
-    })
+    if (error) {
+      return null
+    } else {
+      const user: User | null = await this.getById({ id: result.insertId })
+
+      return user
+    }
   }
 
   static async login (args: {
     name: string
     password: string
   }): Promise<User | null> {
-    const user = await this.getByName({ name: args.name })
-    if (!user) return null
+    const user: User | null = await this.getByName({ name: args.name })
+    const userExists: boolean = Boolean(user)
 
-    const isValid = await bcrypt.compare(args.password, user.password)
+    if (!userExists) return null
+
+    const isValid: boolean = await bcrypt.compare(args.password, user!.password)
+
     return isValid ? user : null
   }
 
   static async delete (args: { id: number }): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      DATABASE.query('DELETE FROM users WHERE id = ?', [args.id], error => {
-        if (error) reject(error)
-        else resolve(true)
-      })
-    })
+    const query = 'DELETE FROM users WHERE id = ?'
+    const params = [args.id]
+    const { error } = await execute(query, params)
+
+    return !Boolean(error)
   }
 
   static async update (args: {
     id: number
     object: Partial<User>
   }): Promise<boolean> {
-    if ('id' in args.object) throw new Error('"id" cannot be updated')
-    if ('created_at' in args.object)
-      throw new Error('"created_at" cannot be updated')
+    if ('created_at' in args.object || 'id' in args.object) {
+      return false
+    }
 
     if (args.object.password) {
       args.object.password = bcrypt.hashSync(args.object.password, SALT_ROUNDS)
@@ -150,14 +137,13 @@ export class UserModel {
     const setClause = Object.keys(args.object)
       .map(key => `${key} = ?`)
       .join(', ')
+    if (!setClause) return false
+
     const params = [...Object.values(args.object), args.id]
     const query = `UPDATE users SET ${setClause} WHERE id = ?`
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, error => {
-        if (error) reject(error)
-        else resolve(true)
-      })
-    })
+    const { failed } = await execute<ResultSetHeader>(query, params)
+
+    return !failed
   }
 }

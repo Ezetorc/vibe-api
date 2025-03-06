@@ -1,70 +1,85 @@
 import { PostModel } from '../models/post.model.js';
 import { validatePartialPost, validatePost } from '../schemas/post.schema.js';
+import { Data } from 'api-responser';
+import { isString } from '../utilities/isString.js';
+import { isEmpty } from '../utilities/isEmpty.js';
 export class PostController {
     static async getAll(request, response) {
         const { amount, page } = request.query;
         const posts = await PostModel.getAll({ amount, page });
-        response.json(posts);
+        response.json(Data.success(posts));
     }
     static async getById(request, response) {
-        const { id } = request.params;
+        const { id } = request.query;
+        if (!isString(id) || isEmpty(id)) {
+            response.status(400).json(Data.failure('ID is missing'));
+            return;
+        }
         const post = await PostModel.getById({ id: Number(id) });
         if (post) {
-            response.json(post);
+            response.json(Data.success(post));
         }
         else {
-            response.json('Post not found');
+            response.json(Data.failure('Post not found'));
         }
     }
     static async search(request, response) {
-        const { query } = request.params;
-        const { userId } = request.query;
-        if (!query || query.trim() === '') {
-            response.status(400).json({ error: 'Query parameter is required' });
+        const { query, userId } = request.query;
+        if (!isString(query) || isEmpty(query)) {
+            response.status(400).json(Data.failure('Query is missing'));
             return;
         }
         const posts = await PostModel.search({ query, userId });
-        response.json(posts);
+        response.json(Data.success(posts));
     }
     static async create(request, response) {
         const result = validatePost(request.body);
         if (!result.success) {
-            response.status(400).json({ error: result.error });
+            response.status(400).json(Data.failure(result.error));
             return;
         }
         const { user_id: userId, content } = result.data;
         const postCreation = await PostModel.create({ userId, content });
-        response.status(201).json(postCreation);
+        if (postCreation) {
+            response.status(201).json(Data.success(true));
+        }
+        else {
+            response.status(404).json(Data.failure(false));
+        }
     }
     static async delete(request, response) {
-        const { id } = request.params;
-        const postDeleted = await PostModel.delete({ id: Number(id) });
-        if (!postDeleted) {
-            response.status(404).json({ message: 'Post not found' });
+        const { id } = request.query;
+        if (!isString(id) || isEmpty(id)) {
+            response.status(400).json(Data.failure('ID is missing'));
             return;
         }
-        response.json({ message: 'Post deleted successfully' });
-        return;
+        const deleteSuccess = await PostModel.delete({ id: Number(id) });
+        if (!deleteSuccess) {
+            response.status(404).json(Data.failure('Post not found'));
+        }
+        else {
+            response.json(Data.success(true));
+        }
     }
     static async update(request, response) {
         const postValidation = validatePartialPost(request.body);
         if (!postValidation.success) {
             response
                 .status(400)
-                .json({ error: JSON.parse(postValidation.error.message) });
+                .json(Data.failure(JSON.parse(postValidation.error.message)));
             return;
         }
-        const { id } = request.params;
-        const postUpdate = await PostModel.update({
+        const { id } = request.query;
+        const updateSuccess = await PostModel.update({
             id: Number(id),
             object: postValidation.data
         });
-        if (!postUpdate) {
+        if (!updateSuccess) {
             response
                 .status(404)
-                .json({ message: 'Post not found or no changes made' });
+                .json(Data.failure('Post not found or no changes made'));
             return;
         }
-        response.json({ message: 'Post updated successfully' });
+        response.json(Data.success(true));
     }
 }

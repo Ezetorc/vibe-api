@@ -1,5 +1,5 @@
-import { DATABASE } from '../settings.js';
 import { getDataByAmount } from '../utilities/getDataByAmount.js';
+import { execute } from '../utilities/execute.js';
 export class PostModel {
     static async getAll(args) {
         const { query, params } = getDataByAmount({
@@ -8,16 +8,13 @@ export class PostModel {
             page: Number(args.page),
             params: []
         });
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, (error, rows) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(rows);
-                }
-            });
-        });
+        const { failed, rows } = await execute(query, params);
+        if (failed) {
+            return [];
+        }
+        else {
+            return rows;
+        }
     }
     static async search(args) {
         const query = args.userId
@@ -26,80 +23,49 @@ export class PostModel {
         const params = args.userId
             ? [`%${args.query}%`, args.userId]
             : [`%${args.query}%`];
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, (error, rows) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(rows);
-                }
-            });
-        });
+        const { rows, failed } = await execute(query, params);
+        if (failed) {
+            return [];
+        }
+        else {
+            return rows;
+        }
     }
     static async getById(args) {
         const query = 'SELECT * FROM posts WHERE id = ?';
         const params = [args.id];
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, (error, rows) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(rows[0]);
-                }
-            });
-        });
+        const { failed, rows } = await execute(query, params);
+        if (failed) {
+            return null;
+        }
+        else {
+            return rows.length > 0 ? rows[0] : null;
+        }
     }
     static async create(args) {
         const query = 'INSERT INTO posts (user_id, content) VALUES (?, ?)';
         const params = [args.userId, args.content];
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, error => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(true);
-                }
-            });
-        });
+        const { failed } = await execute(query, params);
+        return !failed;
     }
     static async delete(args) {
-        return new Promise((resolve, reject) => {
-            const query = 'DELETE FROM posts WHERE id = ?';
-            const params = [args.id];
-            DATABASE.query(query, params, error => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(true);
-                }
-            });
-        });
+        const query = 'DELETE FROM posts WHERE id = ?';
+        const params = [args.id];
+        const { failed } = await execute(query, params);
+        return !failed;
     }
     static async update(args) {
-        return new Promise((resolve, reject) => {
-            if ('id' in args.object) {
-                return reject(new Error('"id" cannot be updated'));
-            }
-            if ('created_at' in args.object) {
-                return reject(new Error('"created_at" cannot be updated'));
-            }
-            const clause = Object.keys(args.object)
-                .map(key => `${key} = ?`)
-                .join(', ');
-            const query = `UPDATE posts SET ${clause} WHERE id = ?`;
-            const params = [...Object.values(args.object), args.id];
-            DATABASE.query(query, params, error => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(true);
-                }
-            });
-        });
+        if ('created_at' in args.object || 'id' in args.object) {
+            return false;
+        }
+        const setClause = Object.keys(args.object)
+            .map(key => `${key} = ?`)
+            .join(', ');
+        if (!setClause)
+            return false;
+        const params = [...Object.values(args.object), args.id];
+        const query = `UPDATE posts SET ${setClause} WHERE id = ?`;
+        const { failed } = await execute(query, params);
+        return !failed;
     }
 }

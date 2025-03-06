@@ -1,8 +1,8 @@
-import { RowDataPacket } from 'mysql2';
+import { ResultSetHeader } from 'mysql2'
 import { Post } from '../schemas/post.schema.js'
-import { DATABASE } from '../settings.js'
 import { Query } from '../structures/Query.js'
 import { getDataByAmount } from '../utilities/getDataByAmount.js'
+import { execute } from '../utilities/execute.js'
 
 export class PostModel {
   static async getAll (args: { amount?: Query; page?: Query }): Promise<Post[]> {
@@ -13,15 +13,13 @@ export class PostModel {
       params: []
     })
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Post[])
-        }
-      })
-    })
+    const { failed, rows } = await execute(query, params)
+
+    if (failed) {
+      return []
+    } else {
+      return rows as Post[]
+    }
   }
 
   static async search (args: {
@@ -36,30 +34,26 @@ export class PostModel {
       ? [`%${args.query}%`, args.userId]
       : [`%${args.query}%`]
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Post[])
-        }
-      })
-    })
+    const { rows, failed } = await execute(query, params)
+
+    if (failed) {
+      return []
+    } else {
+      return rows as Post[]
+    }
   }
 
   static async getById (args: { id: number }): Promise<Post | null> {
     const query: string = 'SELECT * FROM posts WHERE id = ?'
     const params: number[] = [args.id]
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows[0] as Post | null)
-        }
-      })
-    })
+    const { failed, rows } = await execute(query, params)
+
+    if (failed) {
+      return null
+    } else {
+      return rows.length > 0 ? (rows[0] as Post) : null
+    }
   }
 
   static async create (args: {
@@ -68,59 +62,37 @@ export class PostModel {
   }): Promise<boolean> {
     const query: string = 'INSERT INTO posts (user_id, content) VALUES (?, ?)'
     const params = [args.userId, args.content]
+    const { failed } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, error => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return !failed
   }
 
   static async delete (args: { id: number }): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const query: string = 'DELETE FROM posts WHERE id = ?'
-      const params: number[] = [args.id]
+    const query: string = 'DELETE FROM posts WHERE id = ?'
+    const params: number[] = [args.id]
+    const { failed } = await execute(query, params)
 
-      DATABASE.query(query, params, error => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return !failed
   }
 
   static async update (args: {
     id: number
     object: Partial<Post>
   }): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      if ('id' in args.object) {
-        return reject(new Error('"id" cannot be updated'))
-      }
+    if ('created_at' in args.object || 'id' in args.object) {
+      return false
+    }
 
-      if ('created_at' in args.object) {
-        return reject(new Error('"created_at" cannot be updated'))
-      }
+    const setClause = Object.keys(args.object)
+      .map(key => `${key} = ?`)
+      .join(', ')
+    if (!setClause) return false
 
-      const clause: string = Object.keys(args.object)
-        .map(key => `${key} = ?`)
-        .join(', ')
-      const query: string = `UPDATE posts SET ${clause} WHERE id = ?`
-      const params = [...Object.values(args.object), args.id]
+    const params = [...Object.values(args.object), args.id]
+    const query = `UPDATE posts SET ${setClause} WHERE id = ?`
 
-      DATABASE.query(query, params, error => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    const { failed } = await execute<ResultSetHeader>(query, params)
+
+    return !failed
   }
 }

@@ -4,5 +4,4 @@ export declare class CommentController {
     static create(request: Request, response: Response): Promise<void>;
     static delete(request: Request, response: Response): Promise<void>;
     static getById(request: Request, response: Response): Promise<void>;
-    static getAllOfPost(request: Request, response: Response): Promise<void>;
 }

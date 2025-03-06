@@ -1,20 +1,33 @@
 import { Request, Response } from 'express'
 import { CommentModel } from '../models/comment.model.js'
 import { Comment, validateComment } from '../schemas/comment.schema.js'
+import { Data } from 'api-responser'
+import { isString } from '../utilities/isString.js'
+import { isEmpty } from '../utilities/isEmpty.js'
 
 export class CommentController {
   static async getAll (request: Request, response: Response): Promise<void> {
-    const { amount, page } = request.query
-    const comments: Comment[] = await CommentModel.getAll({ amount, page })
+    const { amount, page, postId } = request.query
+    let comments: Comment[] = []
 
-    response.json(comments)
+    if (postId) {
+      const newComments: Comment[] = await CommentModel.getAllOfPost({
+        postId: Number(postId)
+      })
+      comments = newComments
+    } else {
+      const newComments: Comment[] = await CommentModel.getAll({ amount, page })
+      comments = newComments
+    }
+
+    response.json(Data.success(comments))
   }
 
   static async create (request: Request, response: Response): Promise<void> {
     const isNewCommentValid = validateComment(request.body)
 
     if (!isNewCommentValid.success) {
-      response.status(400).json(isNewCommentValid.error)
+      response.status(400).json(Data.failure(isNewCommentValid.error))
       return
     }
 
@@ -25,45 +38,48 @@ export class CommentController {
       userId
     })
 
-    if (newComment == null) {
-      response.status(404).json(null)
-      return
+    if (!newComment) {
+      response.status(404).json(Data.failure('Error during comment creation'))
+    } else {
+      response.json(Data.success(newComment))
     }
-
-    response.json(newComment)
   }
 
   static async delete (request: Request, response: Response): Promise<void> {
-    const { id } = request.params
-    const commentDeleted: boolean = await CommentModel.delete({
+    const { id } = request.query
+
+    if (!isString(id) || isEmpty(id)) {
+      response.status(400).json(Data.failure('ID is missing'))
+      return
+    }
+
+    const deleteSuccess: boolean = await CommentModel.delete({
       commentId: Number(id)
     })
 
-    if (commentDeleted) {
-      response.json({ message: 'Comment deleted successfully' })
+    if (deleteSuccess) {
+      response.json(Data.success(true))
     } else {
-      response.status(404).json({ message: 'Comment not found' })
+      response.status(404).json(Data.failure('Comment not found'))
     }
   }
 
   static async getById (request: Request, response: Response): Promise<void> {
-    const { id } = request.params
-    const comment: Comment = await CommentModel.getById({
+    const { id } = request.query
+
+    if (!isString(id) || isEmpty(id)) {
+      response.status(400).json(Data.failure('ID is missing'))
+      return
+    }
+
+    const comment: Comment | null = await CommentModel.getById({
       commentId: Number(id)
     })
 
-    response.json(comment)
-  }
-
-  static async getAllOfPost (
-    request: Request,
-    response: Response
-  ): Promise<void> {
-    const { id } = request.params
-    const comments: Comment[] = await CommentModel.getAllOfPost({
-      postId: Number(id)
-    })
-
-    response.json(comments)
+    if (comment) {
+      response.json(Data.success(comment))
+    } else {
+      response.status(404).json(Data.failure('Comment not found'))
+    }
   }
 }

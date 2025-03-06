@@ -1,15 +1,19 @@
 import { Router } from 'express'
 import { PostController } from '../controllers/post.controller.js'
-import { tokenMiddleware } from '../middlewares/token.middleware.js'
+import { sessionMiddleware } from '../middlewares/session.middleware.js'
 
 export const PostRouter = Router()
 
-PostRouter.get('/', PostController.getAll)
-PostRouter.get('/search/:query', PostController.search)
-PostRouter.get('/id/:id', PostController.getById)
+// GET
+PostRouter.get('/all', PostController.getAll)
+PostRouter.get('/search', PostController.search)
+PostRouter.get('/id', PostController.getById)
 
-PostRouter.post('/', tokenMiddleware, PostController.create)
+// POST
+PostRouter.post('/', sessionMiddleware, PostController.create)
 
-PostRouter.delete('/id/:id', PostController.delete)
+// DELETE
+PostRouter.delete('/id', sessionMiddleware, PostController.delete)
 
-PostRouter.patch('/id/:id', tokenMiddleware, PostController.update)
+// PATCH
+PostRouter.patch('/id', sessionMiddleware, PostController.update)

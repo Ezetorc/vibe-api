@@ -3,9 +3,11 @@ import { FollowerController } from '../controllers/follower.controller.js'
 
 export const FollowerRouter = Router()
 
-FollowerRouter.get('/', FollowerController.getAll)
-FollowerRouter.get('/user/:userId', FollowerController.getUserFollowersIds)
+// GET
+FollowerRouter.get('/all', FollowerController.getAll)
 
+// POST
 FollowerRouter.post('/', FollowerController.create)
 
+// DELETE
 FollowerRouter.delete('/', FollowerController.delete)

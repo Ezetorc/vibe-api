@@ -1,92 +1,53 @@
-import { RowDataPacket } from 'mysql2'
 import { Follower } from '../schemas/follower.schema.js'
-import { DATABASE } from '../settings.js'
+import { execute } from '../utilities/execute.js'
 
 export class FollowerModel {
   static async getAll (): Promise<Follower[]> {
     const query: string = 'SELECT * FROM followers'
     const params: string[] = []
+    const { failed, rows } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Follower[])
-        }
-      })
-    })
+    if (failed) {
+      return []
+    } else {
+      return rows as Follower[]
+    }
   }
 
-  static async getUserFollowersIds (args: {
-    userId: number
-  }): Promise<number[]> {
+  static async getUserFollowers (args: { userId: number }): Promise<Follower[]> {
     const query: string =
-      'SELECT follower_id FROM followers WHERE following_id = ?'
+      'SELECT * FROM followers WHERE following_id = ?'
     const params = [args.userId]
+    const { failed, rows } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows.map(row => row.follower_id))
-        }
-      })
-    })
+    if (failed) {
+      return []
+    } else {
+      return rows as Follower[]
+    }
   }
 
-  static async getUserFollowing (args: { userId: number }): Promise<number[]> {
-    const query: string =
-      'SELECT following_id FROM followers WHERE follower_id = ?'
-    const params = [args.userId]
-
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows.map(row => row.following_id))
-        }
-      })
-    })
-  }
-
-  static create (args: {
+  static async create (args: {
     followerId: number
     followingId: number
   }): Promise<boolean> {
     const query: string =
       'INSERT INTO followers (follower_id, following_id) VALUES (?, ?)'
     const params = [args.followerId, args.followingId]
+    const { failed } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, error => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return !failed
   }
 
-  static delete (args: {
+  static async delete (args: {
     followerId: number
     followingId: number
   }): Promise<boolean> {
     const query: string =
       'DELETE FROM followers WHERE follower_id = ? AND following_id = ?'
     const params = [args.followerId, args.followingId]
+    const { failed } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, function (error) {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return !failed
   }
 }

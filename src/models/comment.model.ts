@@ -1,8 +1,8 @@
-import { ResultSetHeader, RowDataPacket } from 'mysql2'
+import { ResultSetHeader } from 'mysql2'
 import { Comment } from '../schemas/comment.schema.js'
-import { DATABASE } from '../settings.js'
 import { Query } from '../structures/Query.js'
 import { getDataByAmount } from '../utilities/getDataByAmount.js'
+import { execute } from '../utilities/execute.js'
 
 export class CommentModel {
   static async getAll (args: {
@@ -16,15 +16,13 @@ export class CommentModel {
       params: []
     })
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Comment[])
-        }
-      })
-    })
+    const { rows, failed } = await execute(query, params)
+
+    if (failed) {
+      return []
+    } else {
+      return rows as Comment[]
+    }
   }
 
   static async create (args: {
@@ -35,72 +33,50 @@ export class CommentModel {
     const query =
       'INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)'
     const params = [args.userId, args.postId, args.content]
+    const { failed, rows: result } = await execute<ResultSetHeader>(
+      query,
+      params
+    )
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, function (error, result: ResultSetHeader) {
-        if (error) {
-          reject(error)
-        } else {
-          const commentId = result.insertId
+    if (failed) {
+      return null
+    } else {
+      const commentId: number = result.insertId
+      const comment: Comment | null = await this.getById({ commentId })
 
-          DATABASE.query(
-            'SELECT * FROM comments WHERE id = ?',
-            [commentId],
-            (error, rows: RowDataPacket[]) => {
-              if (error) {
-                reject(error)
-              } else {
-                resolve(rows[0] as Comment | null)
-              }
-            }
-          )
-        }
-      })
-    })
+      return comment
+    }
   }
 
-  static async getById (args: { commentId: number }): Promise<Comment> {
+  static async getById (args: { commentId: number }): Promise<Comment | null> {
     const query = 'SELECT * FROM comments WHERE id = ?'
     const params = [args.commentId]
+    const { failed, rows } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows: RowDataPacket[]) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows[0] as Comment)
-        }
-      })
-    })
+    if (failed) {
+      return null
+    } else {
+      return rows.length > 0 ? (rows[0] as Comment) : null
+    }
   }
 
   static async delete (args: { commentId: number }): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const query: string = 'DELETE FROM comments WHERE id = ?'
-      const params = [args.commentId]
+    const query: string = 'DELETE FROM comments WHERE id = ?'
+    const params = [args.commentId]
+    const { failed } = await execute(query, params)
 
-      DATABASE.query(query, params, error => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return !failed
   }
 
   static async getAllOfPost (args: { postId: number }): Promise<Comment[]> {
     const query: string = 'SELECT * FROM comments WHERE post_id = ?'
     const params = [args.postId]
+    const { failed, rows } = await execute(query, params)
 
-    return new Promise((resolve, reject) => {
-      DATABASE.query(query, params, (error, rows) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(rows as Comment[])
-        }
-      })
-    })
+    if (failed) {
+      return []
+    } else {
+      return rows as Comment[]
+    }
   }
 }

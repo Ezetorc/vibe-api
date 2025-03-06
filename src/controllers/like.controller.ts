@@ -1,53 +1,52 @@
 import { Request, Response } from 'express'
 import { LikeModel } from '../models/like.model.js'
 import { Like, validateLike } from '../schemas/like.schema.js'
+import { Data } from '../structures/Data.js'
+import { isString } from '../utilities/isString.js'
+import { isEmpty } from '../utilities/isEmpty.js'
 
 export class LikeController {
-  static async getAllOfPost (
-    request: Request,
-    response: Response
-  ): Promise<void> {
-    const { id } = request.params
-    const likes: Like[] = await LikeModel.getAllOfPost({ postId: Number(id) })
+  static async getAll (request: Request, response: Response): Promise<void> {
+    const { id, type } = request.query
 
-    response.json(likes)
-  }
+    if (!isString(type) || isEmpty(type)) {
+      response.status(400).json(Data.failure('Type is missing'))
+      return
+    }
 
-  static async getAllOfComment (
-    request: Request,
-    response: Response
-  ): Promise<void> {
-    const { id } = request.params
-    const likes: Like[] = await LikeModel.getAllOfComment({
-      commentId: Number(id)
-    })
+    if (type !== 'comment' && type !== 'post') {
+      response.status(400).json(Data.failure('Invalid type'))
+      return
+    }
 
-    response.json(likes)
-  }
+    let likes: Like[] = []
 
-  static async getAllOfPosts (
-    _request: Request,
-    response: Response
-  ): Promise<void> {
-    const likes: Like[] = await LikeModel.getAllOfPosts()
+    if (id) {
+      const likeId = Number(id)
+      if (isNaN(likeId)) {
+        response.status(400).json(Data.failure('Invalid ID'))
+        return
+      }
 
-    response.json(likes)
-  }
+      likes =
+        type === 'comment'
+          ? await LikeModel.getAllOfComment({ commentId: likeId })
+          : await LikeModel.getAllOfPost({ postId: likeId })
+    } else {
+      likes =
+        type === 'comment'
+          ? await LikeModel.getAllOfComments()
+          : await LikeModel.getAllOfPosts()
+    }
 
-  static async getAllOfComments (
-    _request: Request,
-    response: Response
-  ): Promise<void> {
-    const likes: Like[] = await LikeModel.getAllOfComments()
-
-    response.json(likes)
+    response.json(Data.success(likes))
   }
 
   static async create (request: Request, response: Response): Promise<void> {
     const isNewLikeValid = validateLike(request.body)
 
     if (!isNewLikeValid.success) {
-      response.status(400).json({ error: isNewLikeValid.error })
+      response.status(400).json(Data.failure(isNewLikeValid.error.toString()))
       return
     }
 
@@ -59,22 +58,28 @@ export class LikeController {
     })
 
     if (!newLikeCreated) {
-      response.status(404).json('Error while creating like')
+      response.status(404).json(Data.failure('Error during like creation'))
       return
     }
 
-    response.json(newLikeCreated)
+    response.json(Data.success(newLikeCreated))
   }
 
   static async delete (request: Request, response: Response): Promise<void> {
-    const { id } = request.params
-    const likeDeleted = await LikeModel.delete({ id: Number(id) })
+    const { id } = request.query
 
-    if (!likeDeleted) {
-      response.status(404).json({ message: 'Like not found' })
+    if (!isString(id) || isEmpty(id)) {
+      response.status(400).json(Data.failure('ID is missing'))
       return
     }
 
-    response.json({ message: 'Like deleted successfully' })
+    const likeDeleted = await LikeModel.delete({ id: Number(id) })
+
+    if (!likeDeleted) {
+      response.status(404).json(Data.failure('Like not found'))
+      return
+    }
+
+    response.json(Data.success(true))
   }
 }

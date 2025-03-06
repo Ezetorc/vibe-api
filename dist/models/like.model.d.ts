@@ -8,6 +8,9 @@ export declare class LikeModel {
     }): Promise<Like[]>;
     static getAllOfPosts(): Promise<Like[]>;
     static getAllOfComments(): Promise<Like[]>;
+    static getById(args: {
+        id: number;
+    }): Promise<Like | null>;
     static create(args: {
         targetId: number;
         type: 'post' | 'comment';

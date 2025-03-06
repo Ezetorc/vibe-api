@@ -1,55 +1,51 @@
 import { validatePartialUser } from '../schemas/user.schema.js';
-import { getAccessToken } from '../utilities/getAccessToken.js';
 import { UserModel } from '../models/user.model.js';
-import { CLOUDINARY } from '../settings.js';
+import { CLOUDINARY, COOKIES } from '../settings.js';
+import { isString } from '../utilities/isString.js';
+import { isEmpty } from '../utilities/isEmpty.js';
+import { Data } from '../structures/Data.js';
+import { getSessionCookie } from '../utilities/getSessionCookie.js';
 export class UserController {
     static async getAll(request, response) {
         const { amount, page } = request.query;
         const users = await UserModel.getAll({ amount, page });
-        response.json(users);
-    }
-    static async deleteImage(request, response) {
-        const { id } = request.params;
-        if (!id) {
-            response.status(400).json(false);
-            return;
-        }
-        const result = await CLOUDINARY.uploader.destroy(id);
-        if (result.result === 'ok') {
-            response.status(200).json(true);
-        }
-        else {
-            response.status(400).json(false);
-        }
-    }
-    static async emailExists(request, response) {
-        const { email } = request.params;
-        const emailExists = await UserModel.exists({ email });
-        response.json(emailExists);
-    }
-    static async nameExists(request, response) {
-        const { name } = request.params;
-        const nameExists = await UserModel.exists({ name });
-        response.json(nameExists);
-    }
-    static async getByUsername(request, response) {
-        const { username } = request.params;
-        const user = await UserModel.getByName({ name: username });
-        response.json(user);
-    }
-    static async getById(request, response) {
-        const { id } = request.params;
-        const user = await UserModel.getById({ id: Number(id) });
-        response.json(user);
+        response.json(Data.success(users));
     }
     static async search(request, response) {
-        const { query } = request.params;
-        if (!query || query.trim() === '') {
-            response.status(400).json({ error: 'Query parameter is required' });
+        const { query } = request.query;
+        if (!isString(query) || isEmpty(query)) {
+            response.status(400).json(Data.failure('Query parameter is missing'));
             return;
         }
         const users = await UserModel.search({ query });
-        response.json(users);
+        response.json(Data.success(users));
+    }
+    static async getById(request, response) {
+        const { id } = request.query;
+        if (!isString(id) || isEmpty(id)) {
+            response.status(400).json(Data.failure('ID is missing'));
+            return;
+        }
+        const user = await UserModel.getById({ id: Number(id) });
+        response.json(Data.success(user));
+    }
+    static async getByName(request, response) {
+        const { name } = request.query;
+        if (!isString(name) || isEmpty(name)) {
+            response.status(400).json(Data.failure('Name is missing'));
+            return;
+        }
+        const user = await UserModel.getByName({ name });
+        response.json(user);
+    }
+    static async getByEmail(request, response) {
+        const { email } = request.query;
+        if (!isString(email) || isEmpty(email)) {
+            response.status(400).json(Data.failure('Email is missing'));
+            return;
+        }
+        const user = await UserModel.getByEmail({ email });
+        response.json(Data.success(user));
     }
     static async register(request, response) {
         const { name, email, password } = request.body;
@@ -59,28 +55,23 @@ export class UserController {
             password
         });
         if (result.error) {
-            response.status(400).json(false);
+            response.status(400).json(Data.failure('Invalid user data'));
             return;
         }
-        const registered = await UserModel.register({
+        const user = await UserModel.register({
             name,
             email,
             password
         });
-        if (registered === null) {
-            response.status(400).json(false);
+        if (!user) {
+            response.status(400).json(Data.failure('Error during register'));
             return;
         }
-        const registeredUser = await UserModel.getByName({ name });
-        if (!registeredUser) {
-            response.status(400).json(false);
-            return;
-        }
-        const accessToken = getAccessToken(registeredUser);
+        const sessionCookie = getSessionCookie(user);
         response
-            .cookie('access_token', accessToken.token, accessToken.config)
+            .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
             .status(201)
-            .json(true);
+            .json(Data.success(true));
     }
     static async login(request, response) {
         const { name, password } = request.body;
@@ -89,7 +80,7 @@ export class UserController {
             password
         });
         if (!result.success) {
-            response.status(400).json(false);
+            response.status(400).json(Data.failure('invalid user data'));
             return;
         }
         const user = await UserModel.login({ name, password });
@@ -97,49 +88,66 @@ export class UserController {
             response.json(false);
             return;
         }
-        const accessToken = getAccessToken(user);
+        const sessionCookie = getSessionCookie(user);
         response
-            .cookie('access_token', accessToken.token, accessToken.config)
-            .json(true);
+            .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
+            .json(Data.success(true));
     }
     static async logout(_request, response) {
-        response.clearCookie('access_token').json({ message: 'Logged out' });
+        response.clearCookie(COOKIES.SESSION).json(Data.success(true));
     }
-    static async delete(request, response) {
-        const { id } = request.params;
-        const userDeleted = await UserModel.delete({ id: Number(id) });
-        if (!userDeleted) {
-            response.status(404).json({ message: 'User not found' });
+    static async deleteImage(request, response) {
+        const { id } = request.query;
+        if (!isString(id) || isEmpty(id)) {
+            response.status(400).json(Data.failure('ID is missing'));
             return;
         }
-        response.json({ message: 'User deleted successfully' });
+        const result = await CLOUDINARY.uploader.destroy(id);
+        if (result.result === 'ok') {
+            response.status(200).json(Data.success(true));
+        }
+        else {
+            response
+                .status(400)
+                .json(Data.failure('Error during Cloudinary image destroy'));
+        }
+    }
+    static async delete(request, response) {
+        const { id } = request.query;
+        if (!isString(id) || isEmpty(id)) {
+            response.status(400).json(Data.failure('ID is missing'));
+            return;
+        }
+        const deleteSuccess = await UserModel.delete({ id: Number(id) });
+        if (!deleteSuccess) {
+            response.status(404).json(Data.failure('User not found'));
+            return;
+        }
+        response.json(Data.success(true));
     }
     static async update(request, response) {
         const result = validatePartialUser(request.body);
         if (!result.success) {
-            response.status(400).json({ error: JSON.parse(result.error.message) });
+            response.status(400).json(Data.failure(JSON.parse(result.error.message)));
             return;
         }
         const { id } = request.params;
-        const userUpdate = await UserModel.update({
+        const updateSuccess = await UserModel.update({
             id: Number(id),
             object: result.data
         });
-        if (!userUpdate) {
-            response.status(404).json({ message: 'No changes made' });
+        if (!updateSuccess) {
+            response.status(404).json(Data.failure('No changes made'));
             return;
         }
-        const updatedUser = await UserModel.getById({ id: Number(id) });
-        if (updatedUser === null) {
-            response.json({ message: 'User not found' });
+        const user = await UserModel.getById({ id: Number(id) });
+        if (!user) {
+            response.json(Data.failure('User not found'));
             return;
         }
-        const accessToken = getAccessToken(updatedUser);
+        const sessionCookie = getSessionCookie(user);
         response
-            .cookie('access_token', accessToken.token, accessToken.config)
-            .json({
-            message: 'User updated successfully',
-            user: updatedUser
-        });
+            .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
+            .json(Data.success(user));
     }
 }

@@ -1,41 +1,60 @@
 import { FollowerModel } from '../models/follower.model.js';
 import { validateFollower } from '../schemas/follower.schema.js';
+import { Data } from '../structures/Data.js';
 export class FollowerController {
-    static async getAll(_request, response) {
-        const followers = await FollowerModel.getAll();
-        response.status(201).json(followers);
+    static async getAll(request, response) {
+        const { userId } = request.query;
+        let followers = [];
+        if (userId) {
+            const newFollowers = await FollowerModel.getUserFollowers({
+                userId: Number(userId)
+            });
+            followers = newFollowers;
+        }
+        else {
+            const newFollowers = await FollowerModel.getAll();
+            followers = newFollowers;
+        }
+        response.status(201).json(Data.success(followers));
     }
     static async create(request, response) {
         const isNewFollowerValid = validateFollower(request.body);
         if (!isNewFollowerValid.success) {
-            response.status(400).json({ error: isNewFollowerValid.error });
+            response
+                .status(400)
+                .json(Data.failure(isNewFollowerValid.error.toString()));
             return;
         }
         const { follower_id: followerId, following_id: followingId } = isNewFollowerValid.data;
-        const newFollowerCreated = await FollowerModel.create({
+        const createSuccess = await FollowerModel.create({
             followerId,
             followingId
         });
-        response.status(201).json(newFollowerCreated);
+        if (createSuccess) {
+            response.status(201).json(Data.success(true));
+        }
+        else {
+            response.status(404).json(Data.failure('Error during follower creation'));
+        }
     }
     static async delete(request, response) {
         const isFollowerToDeleteValid = validateFollower(request.body);
         if (!isFollowerToDeleteValid.success) {
-            response.status(400).json({ error: isFollowerToDeleteValid.error });
+            response
+                .status(400)
+                .json(Data.failure(isFollowerToDeleteValid.error.toString()));
             return;
         }
         const { follower_id: followerId, following_id: followingId } = isFollowerToDeleteValid.data;
-        const followerDeleted = await FollowerModel.delete({
+        const deleteSuccess = await FollowerModel.delete({
             followerId,
             followingId
         });
-        response.status(201).json(followerDeleted);
-    }
-    static async getUserFollowersIds(request, response) {
-        const { userId } = request.params;
-        const userFollowersIds = await FollowerModel.getUserFollowersIds({
-            userId: Number(userId)
-        });
-        response.status(201).json(userFollowersIds);
+        if (deleteSuccess) {
+            response.status(201).json(Data.success(true));
+        }
+        else {
+            response.status(404).json(Data.failure("Error during follower deleting"));
+        }
     }
 }

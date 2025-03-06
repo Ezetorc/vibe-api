@@ -1,5 +1,5 @@
-import { DATABASE } from '../settings.js';
 import { getDataByAmount } from '../utilities/getDataByAmount.js';
+import { execute } from '../utilities/execute.js';
 export class CommentModel {
     static async getAll(args) {
         const { query, params } = getDataByAmount({
@@ -8,79 +8,53 @@ export class CommentModel {
             page: Number(args.page),
             params: []
         });
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, (error, rows) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(rows);
-                }
-            });
-        });
+        const { rows, failed } = await execute(query, params);
+        if (failed) {
+            return [];
+        }
+        else {
+            return rows;
+        }
     }
     static async create(args) {
         const query = 'INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)';
         const params = [args.userId, args.postId, args.content];
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, function (error, result) {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    const commentId = result.insertId;
-                    DATABASE.query('SELECT * FROM comments WHERE id = ?', [commentId], (error, rows) => {
-                        if (error) {
-                            reject(error);
-                        }
-                        else {
-                            resolve(rows[0]);
-                        }
-                    });
-                }
-            });
-        });
+        const { failed, rows: result } = await execute(query, params);
+        if (failed) {
+            return null;
+        }
+        else {
+            const commentId = result.insertId;
+            const comment = await this.getById({ commentId });
+            return comment;
+        }
     }
     static async getById(args) {
         const query = 'SELECT * FROM comments WHERE id = ?';
         const params = [args.commentId];
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, (error, rows) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(rows[0]);
-                }
-            });
-        });
+        const { failed, rows } = await execute(query, params);
+        if (failed) {
+            return null;
+        }
+        else {
+            return rows.length > 0 ? rows[0] : null;
+        }
     }
     static async delete(args) {
-        return new Promise((resolve, reject) => {
-            const query = 'DELETE FROM comments WHERE id = ?';
-            const params = [args.commentId];
-            DATABASE.query(query, params, error => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(true);
-                }
-            });
-        });
+        const query = 'DELETE FROM comments WHERE id = ?';
+        const params = [args.commentId];
+        const { failed } = await execute(query, params);
+        return !failed;
     }
     static async getAllOfPost(args) {
         const query = 'SELECT * FROM comments WHERE post_id = ?';
         const params = [args.postId];
-        return new Promise((resolve, reject) => {
-            DATABASE.query(query, params, (error, rows) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(rows);
-                }
-            });
-        });
+        const { failed, rows } = await execute(query, params);
+        if (failed) {
+            return [];
+        }
+        else {
+            return rows;
+        }
     }
 }
