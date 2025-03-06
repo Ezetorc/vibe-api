@@ -105,7 +105,7 @@
 
 ---
 
-#### **DELETE /users/id**
+#### **DELETE /users**
 
 - **Description:** Deletes a user by ID.
 - **Middleware:** Requires session authentication.
@@ -113,26 +113,28 @@
   - `id` (required): User ID.
 - **Example:**
   ```
-  DELETE /users/id?id=123
+  DELETE /users?id=123
   ```
 
 ---
 
-#### **PATCH /users/id**
+#### **PATCH /users**
 
-- **Description:** Updates user information.
+- **Description:** Updates user information. id and created_at cant be updated.
 - **Middleware:** Requires session authentication.
 - **Request Body:**
+- **Query Parameters:**
+  - `id` (required): User ID.
   ```json
   {
-    "id": 123,
     "name": "Updated Name",
     "email": "updatedemail@example.com"
   }
+  
   ```
 - **Example:**
   ```
-  PATCH /users/id
+  PATCH /users?id=123
   ```
 
 ### Posts API Documentation

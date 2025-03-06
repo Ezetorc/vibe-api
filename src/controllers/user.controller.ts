@@ -53,7 +53,11 @@ export class UserController {
 
     const user: User | null = await UserModel.getByName({ name })
 
-    response.json(user)
+    if (user) {
+      response.json(Data.success(user))
+    } else {
+      response.status(404).json(Data.failure('User not found'))
+    }
   }
 
   static async getByEmail (request: Request, response: Response): Promise<void> {
@@ -172,6 +176,13 @@ export class UserController {
   }
 
   static async update (request: Request, response: Response): Promise<void> {
+    const { id } = request.query
+
+    if (!isString(id) || isEmpty(id)) {
+      response.status(400).json(Data.failure('ID is missing'))
+      return
+    }
+
     const result: SafeParseReturnType<User, {}> = validatePartialUser(
       request.body
     )
@@ -180,8 +191,6 @@ export class UserController {
       response.status(400).json(Data.failure(JSON.parse(result.error.message)))
       return
     }
-
-    const { id } = request.params
 
     const updateSuccess: boolean = await UserModel.update({
       id: Number(id),

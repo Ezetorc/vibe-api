@@ -18,7 +18,7 @@ UserRouter.post('/logout', sessionMiddleware, UserController.logout)
 UserRouter.post('/image', UserController.deleteImage)
 
 // DELETE
-UserRouter.delete('/id', sessionMiddleware, UserController.delete)
+UserRouter.delete('/', sessionMiddleware, UserController.delete)
 
 // PATCH
-UserRouter.patch('/id', sessionMiddleware, UserController.update)
+UserRouter.patch('/', sessionMiddleware, UserController.update)

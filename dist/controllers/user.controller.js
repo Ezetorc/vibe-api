@@ -36,7 +36,12 @@ export class UserController {
             return;
         }
         const user = await UserModel.getByName({ name });
-        response.json(user);
+        if (user) {
+            response.json(Data.success(user));
+        }
+        else {
+            response.status(404).json(Data.failure('User not found'));
+        }
     }
     static async getByEmail(request, response) {
         const { email } = request.query;
@@ -126,12 +131,16 @@ export class UserController {
         response.json(Data.success(true));
     }
     static async update(request, response) {
+        const { id } = request.query;
+        if (!isString(id) || isEmpty(id)) {
+            response.status(400).json(Data.failure('ID is missing'));
+            return;
+        }
         const result = validatePartialUser(request.body);
         if (!result.success) {
             response.status(400).json(Data.failure(JSON.parse(result.error.message)));
             return;
         }
-        const { id } = request.params;
         const updateSuccess = await UserModel.update({
             id: Number(id),
             object: result.data
