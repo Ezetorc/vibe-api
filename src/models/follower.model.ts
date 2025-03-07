@@ -15,8 +15,7 @@ export class FollowerModel {
   }
 
   static async getUserFollowers (args: { userId: number }): Promise<Follower[]> {
-    const query: string =
-      'SELECT * FROM followers WHERE following_id = ?'
+    const query: string = 'SELECT * FROM followers WHERE following_id = ?'
     const params = [args.userId]
     const { failed, rows } = await execute(query, params)
 
@@ -49,5 +48,17 @@ export class FollowerModel {
     const { failed } = await execute(query, params)
 
     return !failed
+  }
+
+  static async exists (args: {
+    followerId: number
+    followingId: number
+  }): Promise<boolean> {
+    const query =
+      'SELECT 1 FROM followers WHERE follower_id = ? AND following_id = ?'
+    const params = [args.followerId, args.followingId]
+    const { failed, rows } = await execute(query, params)
+
+    return !failed && rows.length > 0
   }
 }

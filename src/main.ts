@@ -15,7 +15,7 @@ app
   .use(cookieMiddleware())
   .use(
     corsMiddleware({
-      origin: 'https://vibe-page.vercel.app',
+      origin: 'http://localhost:8888',
       credentials: true
     })
   )

@@ -34,4 +34,10 @@ export class FollowerModel {
         const { failed } = await execute(query, params);
         return !failed;
     }
+    static async exists(args) {
+        const query = 'SELECT 1 FROM followers WHERE follower_id = ? AND following_id = ?';
+        const params = [args.followerId, args.followingId];
+        const { failed, rows } = await execute(query, params);
+        return !failed && rows.length > 0;
+    }
 }

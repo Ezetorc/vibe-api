@@ -17,6 +17,19 @@ export class FollowerController {
         }
         response.status(201).json(Data.success(followers));
     }
+    static async exists(request, response) {
+        const isFollowValid = validateFollower(request.body);
+        if (!isFollowValid.success) {
+            response.status(400).json(Data.failure(isFollowValid.error.toString()));
+            return;
+        }
+        const { follower_id: followerId, following_id: followingId } = isFollowValid.data;
+        const followExists = await FollowerModel.exists({
+            followerId,
+            followingId
+        });
+        response.json(Data.success(followExists));
+    }
     static async create(request, response) {
         const isNewFollowerValid = validateFollower(request.body);
         if (!isNewFollowerValid.success) {
@@ -54,7 +67,7 @@ export class FollowerController {
             response.status(201).json(Data.success(true));
         }
         else {
-            response.status(404).json(Data.failure("Error during follower deleting"));
+            response.status(404).json(Data.failure('Error during follower deleting'));
         }
     }
 }

@@ -12,4 +12,8 @@ export declare class FollowerModel {
         followerId: number;
         followingId: number;
     }): Promise<boolean>;
+    static exists(args: {
+        followerId: number;
+        followingId: number;
+    }): Promise<boolean>;
 }

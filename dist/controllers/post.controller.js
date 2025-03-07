@@ -1,8 +1,6 @@
 import { PostModel } from '../models/post.model.js';
 import { validatePartialPost, validatePost } from '../schemas/post.schema.js';
-import { Data } from 'api-responser';
-import { isString } from '../utilities/isString.js';
-import { isEmpty } from '../utilities/isEmpty.js';
+import { Data } from "../structures/Data.js";
 export class PostController {
     static async getAll(request, response) {
         const { amount, page } = request.query;
@@ -11,7 +9,7 @@ export class PostController {
     }
     static async getById(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
@@ -25,31 +23,31 @@ export class PostController {
     }
     static async search(request, response) {
         const { query, userId } = request.query;
-        if (!isString(query) || isEmpty(query)) {
+        if (!query) {
             response.status(400).json(Data.failure('Query is missing'));
             return;
         }
-        const posts = await PostModel.search({ query, userId });
+        const posts = await PostModel.search({ query: String(query), userId });
         response.json(Data.success(posts));
     }
     static async create(request, response) {
         const result = validatePost(request.body);
         if (!result.success) {
-            response.status(400).json(Data.failure(result.error));
+            response.status(400).json(Data.failure(result.error.toString()));
             return;
         }
         const { user_id: userId, content } = result.data;
-        const postCreation = await PostModel.create({ userId, content });
-        if (postCreation) {
+        const createSuccess = await PostModel.create({ userId, content });
+        if (createSuccess) {
             response.status(201).json(Data.success(true));
         }
         else {
-            response.status(404).json(Data.failure(false));
+            response.status(404).json(Data.failure("Error during post creation"));
         }
     }
     static async delete(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }

@@ -11,6 +11,18 @@
   GET /users/all?amount=10&page=1
   ```
 
+#### **GET /users/liked**
+
+- **Description:** Retrieves if user liked an specific post or comment.
+- **Query Parameters:**
+  - `type` : "post" or "comment".
+  - `userId` : User ID to check.
+  - `targetId` : Target ID to check (ID of the post or the comment).
+- **Example:**
+  ```
+  GET /users/liked?type=post&userId=123&targetId=123
+  ```
+
 #### **GET /users/search**
 
 - **Description:** Searches for users based on a query string.
@@ -264,6 +276,21 @@
 - **Example:**
   ```
   GET /followers?userId=123
+  ```
+
+#### **GET /followers/exists**
+
+- **Description:** Retrieves if the follow exists.
+- **Request Body:**
+  ```json
+  {
+    "follower_id": 123,
+    "following_id": 456
+  }
+  ```
+- **Example:**
+  ```
+  GET /followers/exists
   ```
 
 #### **POST /followers**

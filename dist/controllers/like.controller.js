@@ -1,12 +1,10 @@
 import { LikeModel } from '../models/like.model.js';
 import { validateLike } from '../schemas/like.schema.js';
 import { Data } from '../structures/Data.js';
-import { isString } from '../utilities/isString.js';
-import { isEmpty } from '../utilities/isEmpty.js';
 export class LikeController {
     static async getAll(request, response) {
         const { id, type } = request.query;
-        if (!isString(type) || isEmpty(type)) {
+        if (!type) {
             response.status(400).json(Data.failure('Type is missing'));
             return;
         }
@@ -54,7 +52,7 @@ export class LikeController {
     }
     static async delete(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }

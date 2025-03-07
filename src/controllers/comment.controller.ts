@@ -1,9 +1,7 @@
 import { Request, Response } from 'express'
 import { CommentModel } from '../models/comment.model.js'
 import { Comment, validateComment } from '../schemas/comment.schema.js'
-import { Data } from 'api-responser'
-import { isString } from '../utilities/isString.js'
-import { isEmpty } from '../utilities/isEmpty.js'
+import { Data } from '../structures/Data.js'
 
 export class CommentController {
   static async getAll (request: Request, response: Response): Promise<void> {
@@ -27,7 +25,9 @@ export class CommentController {
     const isNewCommentValid = validateComment(request.body)
 
     if (!isNewCommentValid.success) {
-      response.status(400).json(Data.failure(isNewCommentValid.error))
+      response
+        .status(400)
+        .json(Data.failure(isNewCommentValid.error.toString()))
       return
     }
 
@@ -48,7 +48,7 @@ export class CommentController {
   static async delete (request: Request, response: Response): Promise<void> {
     const { id } = request.query
 
-    if (!isString(id) || isEmpty(id)) {
+    if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }
@@ -67,7 +67,7 @@ export class CommentController {
   static async getById (request: Request, response: Response): Promise<void> {
     const { id } = request.query
 
-    if (!isString(id) || isEmpty(id)) {
+    if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }

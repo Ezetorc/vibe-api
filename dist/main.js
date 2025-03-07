@@ -12,7 +12,7 @@ app
     .disable('x-powered-by')
     .use(cookieMiddleware())
     .use(corsMiddleware({
-    origin: 'https://vibe-page.vercel.app',
+    origin: 'http://localhost:8888',
     credentials: true
 }))
     .use(jsonMiddleware())

@@ -8,6 +8,14 @@ export declare class UserModel {
     static getById(args: {
         id: number;
     }): Promise<User | null>;
+    static likedPost(args: {
+        postId: number;
+        userId: number;
+    }): Promise<boolean>;
+    static likedComment(args: {
+        commentId: number;
+        userId: number;
+    }): Promise<boolean>;
     static getByName(args: {
         name: string;
     }): Promise<User | null>;

@@ -29,6 +29,18 @@ export class UserModel {
             return rows.length > 0 ? rows[0] : null;
         }
     }
+    static async likedPost(args) {
+        const query = 'SELECT 1 FROM likes WHERE type = ? AND user_id = ? AND target_id = ?';
+        const params = ['post', args.userId, args.postId];
+        const { failed, rows } = await execute(query, params);
+        return !failed && rows.length > 0;
+    }
+    static async likedComment(args) {
+        const query = 'SELECT 1 FROM likes WHERE type = ? AND user_id = ? AND target_id = ?';
+        const params = ['comment', args.userId, args.commentId];
+        const { failed, rows } = await execute(query, params);
+        return !failed && rows.length > 0;
+    }
     static async getByName(args) {
         const query = 'SELECT * FROM users WHERE name = ?';
         const params = [args.name];

@@ -3,13 +3,49 @@ import { User, validatePartialUser } from '../schemas/user.schema.js'
 import { UserModel } from '../models/user.model.js'
 import { SafeParseReturnType } from 'zod'
 import { CLOUDINARY, COOKIES } from '../settings.js'
-import { isString } from '../utilities/isString.js'
-import { isEmpty } from '../utilities/isEmpty.js'
 import { Data } from '../structures/Data.js'
 import { SessionCookie } from '../structures/SessionCookie.js'
 import { getSessionCookie } from '../utilities/getSessionCookie.js'
 
 export class UserController {
+  static async liked (request: Request, response: Response): Promise<void> {
+    const { type, userId, targetId } = request.query
+
+    if (!type) {
+      response.status(400).json(Data.failure('Type is missing'))
+      return
+    }
+
+    if (type !== 'comment' && type !== 'post') {
+      response.status(400).json(Data.failure('Invalid type'))
+      return
+    }
+
+    if (!userId) {
+      response.status(400).json(Data.failure('User ID is missing'))
+      return
+    }
+
+    if (!targetId) {
+      response.status(400).json(Data.failure('Target ID is missing'))
+      return
+    }
+
+    if (type === 'comment') {
+      const liked = await UserModel.likedComment({
+        commentId: Number(targetId),
+        userId: Number(userId)
+      })
+      response.json(Data.success(liked))
+    } else if (type === 'post') {
+      const liked = await UserModel.likedPost({
+        postId: Number(targetId),
+        userId: Number(userId)
+      })
+      response.json(Data.success(liked))
+    }
+  }
+
   static async getAll (request: Request, response: Response): Promise<void> {
     const { amount, page } = request.query
     const users: User[] = await UserModel.getAll({ amount, page })
@@ -20,12 +56,12 @@ export class UserController {
   static async search (request: Request, response: Response): Promise<void> {
     const { query } = request.query
 
-    if (!isString(query) || isEmpty(query)) {
+    if (!query) {
       response.status(400).json(Data.failure('Query parameter is missing'))
       return
     }
 
-    const users: User[] = await UserModel.search({ query })
+    const users: User[] = await UserModel.search({ query: String(query) })
 
     response.json(Data.success(users))
   }
@@ -33,25 +69,29 @@ export class UserController {
   static async getById (request: Request, response: Response): Promise<void> {
     const { id } = request.query
 
-    if (!isString(id) || isEmpty(id)) {
+    if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }
 
     const user: User | null = await UserModel.getById({ id: Number(id) })
 
-    response.json(Data.success(user))
+    if (user) {
+      response.json(Data.success(user))
+    } else {
+      response.status(404).json(Data.failure('User not found'))
+    }
   }
 
   static async getByName (request: Request, response: Response): Promise<void> {
     const { name } = request.query
 
-    if (!isString(name) || isEmpty(name)) {
+    if (!name) {
       response.status(400).json(Data.failure('Name is missing'))
       return
     }
 
-    const user: User | null = await UserModel.getByName({ name })
+    const user: User | null = await UserModel.getByName({ name: String(name) })
 
     if (user) {
       response.json(Data.success(user))
@@ -63,14 +103,18 @@ export class UserController {
   static async getByEmail (request: Request, response: Response): Promise<void> {
     const { email } = request.query
 
-    if (!isString(email) || isEmpty(email)) {
+    if (!email) {
       response.status(400).json(Data.failure('Email is missing'))
       return
     }
 
-    const user: User | null = await UserModel.getByEmail({ email })
+    const user: User | null = await UserModel.getByEmail({ email: String(email) })
 
-    response.json(Data.success(user))
+    if (user) {
+      response.json(Data.success(user))
+    } else {
+      response.json(Data.failure('User not found'))
+    }
   }
 
   static async register (request: Request, response: Response): Promise<void> {
@@ -113,7 +157,7 @@ export class UserController {
     })
 
     if (!result.success) {
-      response.status(400).json(Data.failure('invalid user data'))
+      response.status(400).json(Data.failure('Invalid user data'))
       return
     }
 
@@ -141,7 +185,7 @@ export class UserController {
   ): Promise<void> {
     const { id } = request.query
 
-    if (!isString(id) || isEmpty(id)) {
+    if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }
@@ -160,7 +204,7 @@ export class UserController {
   static async delete (request: Request, response: Response): Promise<void> {
     const { id } = request.query
 
-    if (!isString(id) || isEmpty(id)) {
+    if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }
@@ -178,7 +222,7 @@ export class UserController {
   static async update (request: Request, response: Response): Promise<void> {
     const { id } = request.query
 
-    if (!isString(id) || isEmpty(id)) {
+    if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }

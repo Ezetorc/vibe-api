@@ -1,8 +1,6 @@
 import { CommentModel } from '../models/comment.model.js';
 import { validateComment } from '../schemas/comment.schema.js';
-import { Data } from 'api-responser';
-import { isString } from '../utilities/isString.js';
-import { isEmpty } from '../utilities/isEmpty.js';
+import { Data } from '../structures/Data.js';
 export class CommentController {
     static async getAll(request, response) {
         const { amount, page, postId } = request.query;
@@ -22,7 +20,9 @@ export class CommentController {
     static async create(request, response) {
         const isNewCommentValid = validateComment(request.body);
         if (!isNewCommentValid.success) {
-            response.status(400).json(Data.failure(isNewCommentValid.error));
+            response
+                .status(400)
+                .json(Data.failure(isNewCommentValid.error.toString()));
             return;
         }
         const { post_id: postId, content, user_id: userId } = isNewCommentValid.data;
@@ -40,7 +40,7 @@ export class CommentController {
     }
     static async delete(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
@@ -56,7 +56,7 @@ export class CommentController {
     }
     static async getById(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }

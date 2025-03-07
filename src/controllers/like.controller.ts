@@ -2,14 +2,12 @@ import { Request, Response } from 'express'
 import { LikeModel } from '../models/like.model.js'
 import { Like, validateLike } from '../schemas/like.schema.js'
 import { Data } from '../structures/Data.js'
-import { isString } from '../utilities/isString.js'
-import { isEmpty } from '../utilities/isEmpty.js'
 
 export class LikeController {
   static async getAll (request: Request, response: Response): Promise<void> {
     const { id, type } = request.query
 
-    if (!isString(type) || isEmpty(type)) {
+    if (!type) {
       response.status(400).json(Data.failure('Type is missing'))
       return
     }
@@ -23,6 +21,7 @@ export class LikeController {
 
     if (id) {
       const likeId = Number(id)
+      
       if (isNaN(likeId)) {
         response.status(400).json(Data.failure('Invalid ID'))
         return
@@ -68,7 +67,7 @@ export class LikeController {
   static async delete (request: Request, response: Response): Promise<void> {
     const { id } = request.query
 
-    if (!isString(id) || isEmpty(id)) {
+    if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }

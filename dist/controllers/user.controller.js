@@ -1,11 +1,42 @@
 import { validatePartialUser } from '../schemas/user.schema.js';
 import { UserModel } from '../models/user.model.js';
 import { CLOUDINARY, COOKIES } from '../settings.js';
-import { isString } from '../utilities/isString.js';
-import { isEmpty } from '../utilities/isEmpty.js';
 import { Data } from '../structures/Data.js';
 import { getSessionCookie } from '../utilities/getSessionCookie.js';
 export class UserController {
+    static async liked(request, response) {
+        const { type, userId, targetId } = request.query;
+        if (!type) {
+            response.status(400).json(Data.failure('Type is missing'));
+            return;
+        }
+        if (type !== 'comment' && type !== 'post') {
+            response.status(400).json(Data.failure('Invalid type'));
+            return;
+        }
+        if (!userId) {
+            response.status(400).json(Data.failure('User ID is missing'));
+            return;
+        }
+        if (!targetId) {
+            response.status(400).json(Data.failure('Target ID is missing'));
+            return;
+        }
+        if (type === 'comment') {
+            const liked = await UserModel.likedComment({
+                commentId: Number(targetId),
+                userId: Number(userId)
+            });
+            response.json(Data.success(liked));
+        }
+        else if (type === 'post') {
+            const liked = await UserModel.likedPost({
+                postId: Number(targetId),
+                userId: Number(userId)
+            });
+            response.json(Data.success(liked));
+        }
+    }
     static async getAll(request, response) {
         const { amount, page } = request.query;
         const users = await UserModel.getAll({ amount, page });
@@ -13,29 +44,34 @@ export class UserController {
     }
     static async search(request, response) {
         const { query } = request.query;
-        if (!isString(query) || isEmpty(query)) {
+        if (!query) {
             response.status(400).json(Data.failure('Query parameter is missing'));
             return;
         }
-        const users = await UserModel.search({ query });
+        const users = await UserModel.search({ query: String(query) });
         response.json(Data.success(users));
     }
     static async getById(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
         const user = await UserModel.getById({ id: Number(id) });
-        response.json(Data.success(user));
+        if (user) {
+            response.json(Data.success(user));
+        }
+        else {
+            response.status(404).json(Data.failure('User not found'));
+        }
     }
     static async getByName(request, response) {
         const { name } = request.query;
-        if (!isString(name) || isEmpty(name)) {
+        if (!name) {
             response.status(400).json(Data.failure('Name is missing'));
             return;
         }
-        const user = await UserModel.getByName({ name });
+        const user = await UserModel.getByName({ name: String(name) });
         if (user) {
             response.json(Data.success(user));
         }
@@ -45,12 +81,17 @@ export class UserController {
     }
     static async getByEmail(request, response) {
         const { email } = request.query;
-        if (!isString(email) || isEmpty(email)) {
+        if (!email) {
             response.status(400).json(Data.failure('Email is missing'));
             return;
         }
-        const user = await UserModel.getByEmail({ email });
-        response.json(Data.success(user));
+        const user = await UserModel.getByEmail({ email: String(email) });
+        if (user) {
+            response.json(Data.success(user));
+        }
+        else {
+            response.json(Data.failure('User not found'));
+        }
     }
     static async register(request, response) {
         const { name, email, password } = request.body;
@@ -85,7 +126,7 @@ export class UserController {
             password
         });
         if (!result.success) {
-            response.status(400).json(Data.failure('invalid user data'));
+            response.status(400).json(Data.failure('Invalid user data'));
             return;
         }
         const user = await UserModel.login({ name, password });
@@ -103,7 +144,7 @@ export class UserController {
     }
     static async deleteImage(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
@@ -119,7 +160,7 @@ export class UserController {
     }
     static async delete(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
@@ -132,7 +173,7 @@ export class UserController {
     }
     static async update(request, response) {
         const { id } = request.query;
-        if (!isString(id) || isEmpty(id)) {
+        if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
