@@ -7,6 +7,7 @@ import cookieMiddleware from 'cookie-parser'
 import express, { Application, json as jsonMiddleware } from 'express'
 import { PORT } from './settings.js'
 import { LikeRouter } from './routers/like.router.js'
+import { keyMiddleware } from './middlewares/key.middleware.js'
 
 const app: Application = express()
 
@@ -19,6 +20,7 @@ app
       credentials: true
     })
   )
+  .use(keyMiddleware)
   .use(jsonMiddleware())
   .use('/users', UserRouter)
   .use('/posts', PostRouter)

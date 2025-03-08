@@ -7,4 +7,4 @@ declare global {
         }
     }
 }
-export declare function sessionMiddleware(request: Request, response: Response, next: NextFunction): Promise<void>;
+export declare function sessionMiddleware(request: Request, response: Response, next: NextFunction): void;

@@ -7,6 +7,7 @@ import cookieMiddleware from 'cookie-parser';
 import express, { json as jsonMiddleware } from 'express';
 import { PORT } from './settings.js';
 import { LikeRouter } from './routers/like.router.js';
+import { keyMiddleware } from './middlewares/key.middleware.js';
 const app = express();
 app
     .disable('x-powered-by')
@@ -15,6 +16,7 @@ app
     origin: 'http://localhost:8888',
     credentials: true
 }))
+    .use(keyMiddleware)
     .use(jsonMiddleware())
     .use('/users', UserRouter)
     .use('/posts', PostRouter)

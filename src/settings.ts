@@ -19,6 +19,7 @@ mysqlConnection.connect(error => {
   }
 })
 
+export const API_KEYS = envData.API_KEYS!.split(",");
 export const PORT: number = Number(envData.PORT) || 3000
 export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
 export const SECRET_KEY: string = envData.SECRET_KEY || 'default_key'

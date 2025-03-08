@@ -14,11 +14,11 @@ declare global {
   }
 }
 
-export async function sessionMiddleware (
+export function sessionMiddleware (
   request: Request,
   response: Response,
   next: NextFunction
-): Promise<void> {
+) {
   const codedSessionCookie: string | undefined = request.cookies?.session
 
   if (!codedSessionCookie) {
