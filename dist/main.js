@@ -6,9 +6,11 @@ import express, { json as jsonMiddleware } from 'express';
 import { PORT } from './settings.js';
 import { LikeRouter } from './routers/like.router.js';
 import { originMiddleware } from './middlewares/origin.middleware.js';
+import { debugMiddleware } from './middlewares/debug.middleware.js';
 const app = express();
 app
     .disable('x-powered-by')
+    .use(debugMiddleware)
     .use(originMiddleware)
     .use(jsonMiddleware())
     .use('/users', UserRouter)
