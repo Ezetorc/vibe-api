@@ -7,15 +7,23 @@ export function originMiddleware (
   response: Response,
   next: NextFunction
 ) {
-  const requestOrigin = request.headers.origin
+  console.log('⚠️ Headers: ', request.headers)
+  const requestOrigin = request.headers.origin || request.headers.referer
 
-  console.log('Im HERE: ', requestOrigin)
+  console.log('⚠️ Request Origin: ', requestOrigin)
   console.log(
-    'omg: ',
+    '⚠️ isValid?: ',
     !requestOrigin || !ALLOWED_ORIGINS.includes(requestOrigin)
   )
 
-  if (!requestOrigin || !ALLOWED_ORIGINS.includes(requestOrigin)) {
+  if (!requestOrigin) {
+    console.warn(
+      '⚠️ No origin detected, request may come from Postman or a server.'
+    )
+    return
+  }
+
+  if (!ALLOWED_ORIGINS.includes(requestOrigin)) {
     response.status(403).json(Data.failure('Access not authorized'))
     return
   }
