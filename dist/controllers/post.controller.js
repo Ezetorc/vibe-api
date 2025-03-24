@@ -15,16 +15,18 @@ export class PostController {
             response.json(Data.success(postsAmount));
         }
         else {
-            response.json(Data.failure("Error when getting posts amount"));
+            response.json(Data.failure('Error when getting posts amount'));
         }
     }
     static async getAll(request, response) {
+        console.log('entered: ', request.query);
         const { amount, page, userId } = request.query;
         const posts = await PostModel.getAll({
             amount,
             page,
             userId: Number(userId)
         });
+        console.log("posts: ", posts);
         response.json(Data.success(posts));
     }
     static async getById(request, response) {
