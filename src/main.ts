@@ -6,11 +6,13 @@ import express, { Application, json as jsonMiddleware } from 'express'
 import { PORT } from './settings.js'
 import { LikeRouter } from './routers/like.router.js'
 import { originMiddleware } from './middlewares/origin.middleware.js'
+import { debugMiddleware } from './middlewares/debug.middleware.js'
 
 const app: Application = express()
 
 app
   .disable('x-powered-by')
+  .use(debugMiddleware)
   .use(originMiddleware)
   .use(jsonMiddleware())
   .use('/users', UserRouter)
