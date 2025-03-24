@@ -20,4 +20,3 @@ export const SALT_ROUNDS = Number(envData.SALT_ROUNDS) || 10;
 export const SECRET_KEY = envData.SECRET_KEY || 'default_key';
 export const CLOUDINARY = cloudinary.v2;
 export const DATABASE = mysqlConnection;
-export const NODE_ENV = envData.NODE_ENV;

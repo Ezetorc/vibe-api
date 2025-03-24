@@ -17,6 +17,7 @@ mysqlConnection.connect(error => {
   }
 })
 
+
 export const ALLOWED_ORIGINS: string[] = [envData.API_URL ?? '']
 export const PORT: number = Number(envData.PORT) || 3000
 export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
