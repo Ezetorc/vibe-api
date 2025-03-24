@@ -2,6 +2,7 @@ import { ALLOWED_ORIGINS } from '../settings.js';
 import { Data } from '../structures/Data.js';
 export function originMiddleware(request, response, next) {
     const requestOrigin = request.headers.origin ?? request.headers.referer;
+    console.log("ARJNASEBHORUIAAAAAAAAAAA: ", requestOrigin);
     if (!requestOrigin) {
         console.warn('⚠️  No origin detected, add "referer" or "origin" header');
         response.status(400).json(Data.failure('Missing origin'));
