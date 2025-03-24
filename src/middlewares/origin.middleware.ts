@@ -11,6 +11,7 @@ export function originMiddleware (
   const requestOrigin = request.headers.origin || request.headers.referer
 
   console.log('⚠️ Request Origin: ', requestOrigin)
+  
   console.log(
     '⚠️ isValid?: ',
     !requestOrigin || !ALLOWED_ORIGINS.includes(requestOrigin)
