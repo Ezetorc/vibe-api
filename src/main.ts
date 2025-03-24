@@ -5,7 +5,7 @@ import { UserRouter } from './routers/user.router.js'
 import corsMiddleware from 'cors'
 import cookieMiddleware from 'cookie-parser'
 import express, { Application, json as jsonMiddleware } from 'express'
-import { PORT } from './settings.js'
+import { ALLOWED_ORIGINS, PORT } from './settings.js'
 import { LikeRouter } from './routers/like.router.js'
 import { originMiddleware } from './middlewares/origin.middleware.js'
 
@@ -16,7 +16,7 @@ app
   .use(cookieMiddleware())
   .use(
     corsMiddleware({
-      origin: 'http://localhost:8888',
+      origin: ALLOWED_ORIGINS,
       credentials: true
     })
   )
