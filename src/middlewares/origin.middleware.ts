@@ -8,6 +8,7 @@ export function originMiddleware (
   next: NextFunction
 ) {
   const requestOrigin = request.headers['x-origin'] as string | undefined
+  
 
   console.log('⚠️ Request Origin: ', requestOrigin)
 

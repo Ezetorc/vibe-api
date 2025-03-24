@@ -1,12 +1,10 @@
 import { ALLOWED_ORIGINS } from '../settings.js';
 import { Data } from '../structures/Data.js';
 export function originMiddleware(request, response, next) {
-    console.log('⚠️ Headers: ', request.headers);
-    const requestOrigin = request.headers.origin || request.headers.referer;
+    const requestOrigin = request.headers['x-origin'];
     console.log('⚠️ Request Origin: ', requestOrigin);
-    console.log('⚠️ isValid?: ', !requestOrigin || !ALLOWED_ORIGINS.includes(requestOrigin));
     if (!requestOrigin) {
-        console.warn('⚠️ No origin detected, request may come from Postman or a server.');
+        console.warn('⚠️ No origin detected, add "x-origin" header');
         return;
     }
     if (!ALLOWED_ORIGINS.includes(requestOrigin)) {
