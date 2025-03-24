@@ -24,7 +24,6 @@ export async function sessionMiddleware(request, response, next) {
         next();
     }
     catch (error) {
-        console.error('JWT Verification Error:', error);
         if (!(error instanceof Error))
             return;
         if (error.name === 'TokenExpiredError') {
