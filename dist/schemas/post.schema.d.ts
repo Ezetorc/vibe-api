@@ -16,7 +16,7 @@ declare const PostSchema: zod.ZodObject<{
     created_at?: string | undefined;
 }>;
 export type Post = zod.infer<typeof PostSchema>;
-export declare function validatePost(object: any): zod.SafeParseReturnType<{
+export declare function validatePost(object: unknown): zod.SafeParseReturnType<{
     content: string;
     user_id: number;
     id?: number | undefined;
@@ -27,15 +27,15 @@ export declare function validatePost(object: any): zod.SafeParseReturnType<{
     id?: number | undefined;
     created_at?: string | undefined;
 }>;
-export declare function validatePartialPost(object: any): zod.SafeParseReturnType<{
+export declare function validatePartialPost(object: unknown): zod.SafeParseReturnType<{
     id?: number | undefined;
     content?: string | undefined;
-    user_id?: number | undefined;
     created_at?: string | undefined;
+    user_id?: number | undefined;
 }, {
     id?: number | undefined;
     content?: string | undefined;
-    user_id?: number | undefined;
     created_at?: string | undefined;
+    user_id?: number | undefined;
 }>;
 export {};

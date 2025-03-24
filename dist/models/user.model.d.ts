@@ -5,6 +5,12 @@ export declare class UserModel {
         amount?: Query;
         page?: Query;
     }): Promise<User[]>;
+    static nameExists(args: {
+        name: string;
+    }): Promise<boolean>;
+    static emailExists(args: {
+        email: string;
+    }): Promise<boolean>;
     static getById(args: {
         id: number;
     }): Promise<User | null>;

@@ -7,7 +7,7 @@ import cookieMiddleware from 'cookie-parser';
 import express, { json as jsonMiddleware } from 'express';
 import { PORT } from './settings.js';
 import { LikeRouter } from './routers/like.router.js';
-import { keyMiddleware } from './middlewares/key.middleware.js';
+import { originMiddleware } from './middlewares/origin.middleware.js';
 const app = express();
 app
     .disable('x-powered-by')
@@ -16,11 +16,11 @@ app
     origin: 'http://localhost:8888',
     credentials: true
 }))
-    .use(keyMiddleware)
+    .use(originMiddleware)
     .use(jsonMiddleware())
     .use('/users', UserRouter)
     .use('/posts', PostRouter)
     .use('/likes', LikeRouter)
     .use('/followers', FollowerRouter)
     .use('/comments', CommentRouter)
-    .listen(PORT);
+    .listen(PORT, () => console.log('✅ Vibe API is active'));

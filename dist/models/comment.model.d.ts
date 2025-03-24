@@ -15,7 +15,7 @@ export declare class CommentModel {
     }): Promise<Comment | null>;
     static delete(args: {
         commentId: number;
-    }): Promise<boolean>;
+    }): Promise<Comment | null>;
     static getAllOfPost(args: {
         postId: number;
     }): Promise<Comment[]>;

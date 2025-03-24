@@ -10,6 +10,6 @@ const LikeSchema = zod.object({
 
 export type Like = zod.infer<typeof LikeSchema>
 
-export function validateLike (object: any) {
+export function validateLike (object: unknown) {
   return LikeSchema.safeParse(object)
 }

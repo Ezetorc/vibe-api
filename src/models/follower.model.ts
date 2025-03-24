@@ -14,6 +14,22 @@ export class FollowerModel {
     }
   }
 
+  static async getAmount (args: {
+    userId: number
+    type: 'follower' | 'following'
+  }): Promise<number> {
+    const query = `SELECT COUNT(*) as count FROM followers WHERE ${args.type}_id = ?`
+    const params = [args.userId]
+
+    const { failed, rows } = await execute(query, params)
+
+    if (failed || rows.length === 0) {
+      return 0
+    } else {
+      return rows[0].count as number
+    }
+  }
+
   static async getUserFollowers (args: { userId: number }): Promise<Follower[]> {
     const query: string = 'SELECT * FROM followers WHERE following_id = ?'
     const params = [args.userId]

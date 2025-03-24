@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 export declare class UserController {
+    static exists(request: Request, response: Response): Promise<void>;
     static liked(request: Request, response: Response): Promise<void>;
     static getAll(request: Request, response: Response): Promise<void>;
     static search(request: Request, response: Response): Promise<void>;

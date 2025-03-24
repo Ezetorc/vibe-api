@@ -9,7 +9,7 @@ export function getDataByAmount(args) {
     }
     const offset = amount ? (page - 1) * amount : 0;
     let query = args.query;
-    let params = [...args.params];
+    const params = [...args.params];
     if (amount !== undefined) {
         query += ' LIMIT ? OFFSET ?';
         params.push(amount, offset);

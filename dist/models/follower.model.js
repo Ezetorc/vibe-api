@@ -11,6 +11,17 @@ export class FollowerModel {
             return rows;
         }
     }
+    static async getAmount(args) {
+        const query = `SELECT COUNT(*) as count FROM followers WHERE ${args.type}_id = ?`;
+        const params = [args.userId];
+        const { failed, rows } = await execute(query, params);
+        if (failed || rows.length === 0) {
+            return 0;
+        }
+        else {
+            return rows[0].count;
+        }
+    }
     static async getUserFollowers(args) {
         const query = 'SELECT * FROM followers WHERE following_id = ?';
         const params = [args.userId];

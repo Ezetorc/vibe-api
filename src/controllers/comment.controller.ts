@@ -53,12 +53,12 @@ export class CommentController {
       return
     }
 
-    const deleteSuccess: boolean = await CommentModel.delete({
+    const deletedComment: Comment | null = await CommentModel.delete({
       commentId: Number(id)
     })
 
-    if (deleteSuccess) {
-      response.json(Data.success(true))
+    if (deletedComment) {
+      response.json(Data.success(deletedComment))
     } else {
       response.status(404).json(Data.failure('Comment not found'))
     }

@@ -6,12 +6,35 @@ import {
   validatePost
 } from '../schemas/post.schema.js'
 import { SafeParseReturnType } from 'zod'
-import { Data } from "../structures/Data.js"
+import { Data } from '../structures/Data.js'
 
 export class PostController {
+  static async getAmount (request: Request, response: Response): Promise<void> {
+    const { userId } = request.query
+
+    if (!userId) {
+      response.status(400).json(Data.failure('User ID is missing'))
+      return
+    }
+
+    const postsAmount: number = await PostModel.getAmount({
+      userId: Number(userId)
+    })
+
+    if (postsAmount >= 0) {
+      response.json(Data.success(postsAmount))
+    } else {
+      response.json(Data.failure("Error when getting posts amount"))
+    }
+  }
+
   static async getAll (request: Request, response: Response): Promise<void> {
-    const { amount, page } = request.query
-    const posts: Post[] = await PostModel.getAll({ amount, page })
+    const { amount, page, userId } = request.query
+    const posts: Post[] = await PostModel.getAll({
+      amount,
+      page,
+      userId: Number(userId)
+    })
 
     response.json(Data.success(posts))
   }
@@ -41,7 +64,10 @@ export class PostController {
       return
     }
 
-    const posts: Post[] = await PostModel.search({ query: String(query), userId })
+    const posts: Post[] = await PostModel.search({
+      query: String(query),
+      userId
+    })
 
     response.json(Data.success(posts))
   }
@@ -55,12 +81,12 @@ export class PostController {
     }
 
     const { user_id: userId, content } = result.data
-    const createSuccess = await PostModel.create({ userId, content })
+    const postCreated = await PostModel.create({ userId, content })
 
-    if (createSuccess) {
-      response.status(201).json(Data.success(true))
+    if (postCreated) {
+      response.status(201).json(Data.success(postCreated))
     } else {
-      response.status(404).json(Data.failure("Error during post creation"))
+      response.status(404).json(Data.failure('Error during post creation'))
     }
   }
 

@@ -4,6 +4,23 @@ import { CLOUDINARY, COOKIES } from '../settings.js';
 import { Data } from '../structures/Data.js';
 import { getSessionCookie } from '../utilities/getSessionCookie.js';
 export class UserController {
+    static async exists(request, response) {
+        const { name, email } = request.query;
+        if (!name && !email) {
+            response
+                .status(400)
+                .json(Data.failure('Any name or email has been passed'));
+            return;
+        }
+        if (name) {
+            const nameExists = await UserModel.nameExists({ name: String(name) });
+            response.json(Data.success(nameExists));
+        }
+        else if (email) {
+            const emailExists = await UserModel.emailExists({ email: String(email) });
+            response.json(Data.success(emailExists));
+        }
+    }
     static async liked(request, response) {
         const { type, userId, targetId } = request.query;
         if (!type) {
@@ -85,7 +102,9 @@ export class UserController {
             response.status(400).json(Data.failure('Email is missing'));
             return;
         }
-        const user = await UserModel.getByEmail({ email: String(email) });
+        const user = await UserModel.getByEmail({
+            email: String(email)
+        });
         if (user) {
             response.json(Data.success(user));
         }

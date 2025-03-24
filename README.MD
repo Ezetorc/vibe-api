@@ -11,6 +11,17 @@
   GET /users/all?amount=10&page=1
   ```
 
+#### **GET /users/exists**
+
+- **Description:** Retrieves if an user exists by his name or email.
+- **Query Parameters:**
+  - `name` : (Optional if email is passed) Name of the user.
+  - `email` : (Optional if name is passed) Email of the user.
+- **Example:**
+  ```
+  GET /users/exists?name=jhon&email=jhon@email.com
+  ```
+
 #### **GET /users/liked**
 
 - **Description:** Retrieves if user liked an specific post or comment.
@@ -136,14 +147,16 @@
 - **Middleware:** Requires session authentication.
 - **Request Body:**
 - **Query Parameters:**
+
   - `id` (required): User ID.
+
   ```json
   {
     "name": "Updated Name",
     "email": "updatedemail@example.com"
   }
-  
   ```
+
 - **Example:**
   ```
   PATCH /users?id=123
@@ -157,9 +170,20 @@
 - **Query Parameters:**
   - `amount` (optional): Number of posts to retrieve.
   - `page` (optional): Page number for pagination.
+  - `userId` (optional): ID of the owner of the posts.
 - **Example:**
   ```
   GET /posts?amount=10&page=1
+  ```
+
+#### **GET /posts/amount**
+
+- **Description:** Retrieves the number of posts of the user.
+- **Query Parameters:**
+  - `userId` (optional): ID of the owner of the posts.
+- **Example:**
+  ```
+  GET /posts/amount?userId=123
   ```
 
 #### **GET /posts/search**
@@ -185,7 +209,7 @@
 
 #### **POST /posts**
 
-- **Description:** Creates a new post.
+- **Description:** Creates and returns a new post.
 - **Middleware:** Requires session authentication.
 - **Request Body:**
   ```json
@@ -240,6 +264,17 @@
   GET /likes/all?type=post&id=123
   ```
 
+#### **GET /likes/amount**
+
+- **Description:** Retrieves the amount of likes.
+- **Query Parameters:**
+  - `id` (optional): Target ID (post or comment) to filter likes.
+  - `type` (required): Type of the liked entity (`post` or `comment`).
+- **Example:**
+  ```
+  GET /likes/amount?type=post&targetId=123
+  ```
+
 #### **POST /likes**
 
 - **Description:** Creates a new like.
@@ -278,19 +313,26 @@
   GET /followers?userId=123
   ```
 
+#### **GET /followers/amount**
+
+- **Description:** Retrieves the amount of "followers" of "following" of the user.
+- **Query Parameters:**
+  - `userId` User ID to filter.
+  - `type` "follower" or "following".
+- **Example:**
+  ```
+  GET /followers/amount?userId=123&type=follower
+  ```
+
 #### **GET /followers/exists**
 
 - **Description:** Retrieves if the follow exists.
-- **Request Body:**
-  ```json
-  {
-    "follower_id": 123,
-    "following_id": 456
-  }
-  ```
+- **Query Parameters:**
+  - `follower_id` Follower ID.
+  - `following_id` Following ID.
 - **Example:**
   ```
-  GET /followers/exists
+  GET /followers/exists?followerId=123&followingId=321
   ```
 
 #### **POST /followers**

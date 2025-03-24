@@ -1,5 +1,5 @@
 import cloudinary from 'cloudinary';
-export declare const API_KEYS: string[];
+export declare const ALLOWED_ORIGINS: string[];
 export declare const PORT: number;
 export declare const SALT_ROUNDS: number;
 export declare const SECRET_KEY: string;

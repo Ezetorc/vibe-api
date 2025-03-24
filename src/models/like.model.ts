@@ -15,6 +15,22 @@ export class LikeModel {
     }
   }
 
+  static async getAmount (args: {
+    targetId: number
+    type: 'comment' | 'post'
+  }): Promise<number> {
+    const query = `SELECT COUNT(*) as count FROM likes WHERE target_id = ? AND type = ?`
+    const params = [args.targetId, args.type]
+
+    const { failed, rows } = await execute(query, params)
+
+    if (failed || rows.length === 0) {
+      return 0
+    } else {
+      return rows[0].count as number
+    }
+  }
+
   static async getAllOfComment (args: { commentId: number }): Promise<Like[]> {
     const query: string = 'SELECT * FROM likes WHERE target_id = ? AND type = ?'
     const params = [Number(args.commentId), 'comment']
@@ -89,7 +105,7 @@ export class LikeModel {
     const query: string = 'DELETE FROM likes WHERE id = ?'
     const params = [args.id]
     const { failed } = await execute(query, params)
-    
+
     return !failed
   }
 }

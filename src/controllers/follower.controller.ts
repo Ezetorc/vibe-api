@@ -21,19 +21,52 @@ export class FollowerController {
     response.status(201).json(Data.success(followers))
   }
 
-  static async exists (request: Request, response: Response): Promise<void> {
-    const isFollowValid = validateFollower(request.body)
+  static async getAmount (request: Request, response: Response): Promise<void> {
+    const { userId, type } = request.query
 
-    if (!isFollowValid.success) {
-      response.status(400).json(Data.failure(isFollowValid.error.toString()))
+    if (!userId) {
+      response.status(400).json(Data.failure('User ID is missing'))
       return
     }
 
-    const { follower_id: followerId, following_id: followingId } =
-      isFollowValid.data
+    if (!type) {
+      response.status(400).json(Data.failure('Type is missing'))
+      return
+    }
+
+    if (type !== 'follower' && type !== 'following') {
+      response.status(400).json(Data.failure('Invalid type'))
+      return
+    }
+
+    const followersAmount: number = await FollowerModel.getAmount({
+      userId: Number(userId),
+      type
+    })
+
+    if (followersAmount >= 0) {
+      response.json(Data.success(followersAmount))
+    } else {
+      response.json(Data.failure(`Error when getting ${type} amount`))
+    }
+  }
+
+  static async exists (request: Request, response: Response): Promise<void> {
+    const { followerId, followingId } = request.query
+
+    if (!followerId) {
+      response.status(400).json(Data.failure('Follower ID is missing'))
+      return
+    }
+
+    if (!followingId) {
+      response.status(400).json(Data.failure('Following ID is missing'))
+      return
+    }
+
     const followExists: boolean = await FollowerModel.exists({
-      followerId,
-      followingId
+      followerId: Number(followerId),
+      followingId: Number(followingId)
     })
 
     response.json(Data.success(followExists))

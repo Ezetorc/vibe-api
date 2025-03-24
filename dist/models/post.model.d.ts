@@ -4,7 +4,11 @@ export declare class PostModel {
     static getAll(args: {
         amount?: Query;
         page?: Query;
+        userId?: number;
     }): Promise<Post[]>;
+    static getAmount(args: {
+        userId: number;
+    }): Promise<number>;
     static search(args: {
         query: string;
         userId?: Query;
@@ -15,7 +19,7 @@ export declare class PostModel {
     static create(args: {
         userId: number;
         content: string;
-    }): Promise<boolean>;
+    }): Promise<Post | null>;
     static delete(args: {
         id: number;
     }): Promise<boolean>;

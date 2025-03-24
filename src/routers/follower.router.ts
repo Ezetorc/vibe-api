@@ -5,6 +5,7 @@ export const FollowerRouter = Router()
 
 // GET
 FollowerRouter.get('/all', FollowerController.getAll)
+FollowerRouter.get('/amount', FollowerController.getAmount)
 FollowerRouter.get('/exists', FollowerController.exists)
 
 // POST

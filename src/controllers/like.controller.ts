@@ -21,7 +21,7 @@ export class LikeController {
 
     if (id) {
       const likeId = Number(id)
-      
+
       if (isNaN(likeId)) {
         response.status(400).json(Data.failure('Invalid ID'))
         return
@@ -39,6 +39,36 @@ export class LikeController {
     }
 
     response.json(Data.success(likes))
+  }
+
+  static async getAmount (request: Request, response: Response): Promise<void> {
+    const { targetId, type } = request.query
+
+    if (!type) {
+      response.status(400).json(Data.failure('Type is missing'))
+      return
+    }
+
+    if (type !== 'comment' && type !== 'post') {
+      response.status(400).json(Data.failure('Invalid type'))
+      return
+    }
+
+    if (!targetId) {
+      response.status(400).json(Data.failure('Target ID is missing'))
+      return
+    }
+
+    const likesAmount: number = await LikeModel.getAmount({
+      targetId: Number(targetId),
+      type
+    })
+
+    if (likesAmount >= 0) {
+      response.json(Data.success(likesAmount))
+    } else {
+      response.json(Data.failure('Error when getting likes amount'))
+    }
   }
 
   static async create (request: Request, response: Response): Promise<void> {

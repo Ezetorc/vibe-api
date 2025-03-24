@@ -5,6 +5,7 @@ export const LikeRouter = Router()
 
 // GET
 LikeRouter.get('/all', LikeController.getAll)
+LikeRouter.get('/amount', LikeController.getAmount)
 
 // POST
 LikeRouter.post('/', LikeController.create)

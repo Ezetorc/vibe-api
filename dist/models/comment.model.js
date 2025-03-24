@@ -41,10 +41,18 @@ export class CommentModel {
         }
     }
     static async delete(args) {
+        const comment = await this.getById({
+            commentId: args.commentId
+        });
+        if (!comment)
+            return null;
         const query = 'DELETE FROM comments WHERE id = ?';
         const params = [args.commentId];
         const { failed } = await execute(query, params);
-        return !failed;
+        if (failed) {
+            return null;
+        }
+        return comment;
     }
     static async getAllOfPost(args) {
         const query = 'SELECT * FROM comments WHERE post_id = ?';

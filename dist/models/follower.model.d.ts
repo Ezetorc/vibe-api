@@ -1,6 +1,10 @@
 import { Follower } from '../schemas/follower.schema.js';
 export declare class FollowerModel {
     static getAll(): Promise<Follower[]>;
+    static getAmount(args: {
+        userId: number;
+        type: 'follower' | 'following';
+    }): Promise<number>;
     static getUserFollowers(args: {
         userId: number;
     }): Promise<Follower[]>;

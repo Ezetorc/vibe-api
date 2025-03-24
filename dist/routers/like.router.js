@@ -3,6 +3,7 @@ import { LikeController } from '../controllers/like.controller.js';
 export const LikeRouter = Router();
 // GET
 LikeRouter.get('/all', LikeController.getAll);
+LikeRouter.get('/amount', LikeController.getAmount);
 // POST
 LikeRouter.post('/', LikeController.create);
 // DELETE

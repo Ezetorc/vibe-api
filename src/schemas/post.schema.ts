@@ -15,10 +15,10 @@ const PostSchema = zod.object({
 
 export type Post = zod.infer<typeof PostSchema>
 
-export function validatePost (object: any) {
+export function validatePost (object: unknown) {
   return PostSchema.safeParse(object)
 }
 
-export function validatePartialPost (object: any) {
+export function validatePartialPost (object: unknown) {
   return PostSchema.partial().safeParse(object)
 }

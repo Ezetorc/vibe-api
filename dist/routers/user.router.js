@@ -9,6 +9,7 @@ UserRouter.get('/id', UserController.getById);
 UserRouter.get('/name', UserController.getByName);
 UserRouter.get('/email', UserController.getByEmail);
 UserRouter.get('/liked', UserController.liked);
+UserRouter.get('/exists', UserController.exists);
 // POST
 UserRouter.post('/register', UserController.register);
 UserRouter.post('/login', UserController.login);

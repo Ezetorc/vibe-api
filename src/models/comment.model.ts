@@ -60,12 +60,22 @@ export class CommentModel {
     }
   }
 
-  static async delete (args: { commentId: number }): Promise<boolean> {
+  static async delete (args: { commentId: number }): Promise<Comment | null> {
+    const comment: Comment | null = await this.getById({
+      commentId: args.commentId
+    })
+
+    if (!comment) return null
+
     const query: string = 'DELETE FROM comments WHERE id = ?'
     const params = [args.commentId]
-    const { failed } = await execute(query, params)
+    const { failed } = await execute<ResultSetHeader>(query, params)
 
-    return !failed
+    if (failed) {
+      return null
+    }
+
+    return comment
   }
 
   static async getAllOfPost (args: { postId: number }): Promise<Comment[]> {

@@ -44,11 +44,11 @@ export class CommentController {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
-        const deleteSuccess = await CommentModel.delete({
+        const deletedComment = await CommentModel.delete({
             commentId: Number(id)
         });
-        if (deleteSuccess) {
-            response.json(Data.success(true));
+        if (deletedComment) {
+            response.json(Data.success(deletedComment));
         }
         else {
             response.status(404).json(Data.failure('Comment not found'));

@@ -11,6 +11,17 @@ export class LikeModel {
             return rows;
         }
     }
+    static async getAmount(args) {
+        const query = `SELECT COUNT(*) as count FROM likes WHERE target_id = ? AND type = ?`;
+        const params = [args.targetId, args.type];
+        const { failed, rows } = await execute(query, params);
+        if (failed || rows.length === 0) {
+            return 0;
+        }
+        else {
+            return rows[0].count;
+        }
+    }
     static async getAllOfComment(args) {
         const query = 'SELECT * FROM likes WHERE target_id = ? AND type = ?';
         const params = [Number(args.commentId), 'comment'];

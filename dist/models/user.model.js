@@ -18,6 +18,18 @@ export class UserModel {
             return rows;
         }
     }
+    static async nameExists(args) {
+        const query = `SELECT COUNT(*) AS user_count FROM users WHERE name = ?`;
+        const params = [args.name];
+        const { rows, failed } = await execute(query, params);
+        return !failed && rows[0].user_count > 0;
+    }
+    static async emailExists(args) {
+        const query = `SELECT COUNT(*) AS user_count FROM users WHERE email = ?`;
+        const params = [args.email];
+        const { rows, failed } = await execute(query, params);
+        return !failed && rows[0].user_count > 0;
+    }
     static async getById(args) {
         const query = 'SELECT * FROM users WHERE id = ?';
         const params = [args.id];
@@ -102,8 +114,8 @@ export class UserModel {
     static async delete(args) {
         const query = 'DELETE FROM users WHERE id = ?';
         const params = [args.id];
-        const { error } = await execute(query, params);
-        return !Boolean(error);
+        const { failed } = await execute(query, params);
+        return !failed;
     }
     static async update(args) {
         if ('created_at' in args.object || 'id' in args.object) {

@@ -13,11 +13,8 @@ mysqlConnection.connect(error => {
     if (error) {
         console.error('❌ MySQL Connection error: ', error);
     }
-    else {
-        console.log('✅ MySQL Connection successful');
-    }
 });
-export const API_KEYS = envData.API_KEYS.split(",");
+export const ALLOWED_ORIGINS = ['http://localhost:8888'];
 export const PORT = Number(envData.PORT) || 3000;
 export const SALT_ROUNDS = Number(envData.SALT_ROUNDS) || 10;
 export const SECRET_KEY = envData.SECRET_KEY || 'default_key';

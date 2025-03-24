@@ -14,12 +14,10 @@ const mysqlConnection = mysql.createConnection(envData.MYSQL_PUBLIC_URL!)
 mysqlConnection.connect(error => {
   if (error) {
     console.error('❌ MySQL Connection error: ', error)
-  } else {
-    console.log('✅ MySQL Connection successful')
   }
 })
 
-export const API_KEYS = envData.API_KEYS!.split(",");
+export const ALLOWED_ORIGINS: string[] = ['http://localhost:8888']
 export const PORT: number = Number(envData.PORT) || 3000
 export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
 export const SECRET_KEY: string = envData.SECRET_KEY || 'default_key'

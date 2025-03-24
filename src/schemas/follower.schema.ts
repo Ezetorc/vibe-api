@@ -7,6 +7,6 @@ const FollowerSchema = zod.object({
 
 export type Follower = zod.infer<typeof FollowerSchema>
 
-export function validateFollower (object: any) {
+export function validateFollower (object: unknown) {
   return FollowerSchema.safeParse(object)
 }

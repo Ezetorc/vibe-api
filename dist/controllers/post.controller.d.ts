@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 export declare class PostController {
+    static getAmount(request: Request, response: Response): Promise<void>;
     static getAll(request: Request, response: Response): Promise<void>;
     static getById(request: Request, response: Response): Promise<void>;
     static search(request: Request, response: Response): Promise<void>;

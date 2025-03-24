@@ -2,11 +2,15 @@ import { getDataByAmount } from '../utilities/getDataByAmount.js';
 import { execute } from '../utilities/execute.js';
 export class PostModel {
     static async getAll(args) {
+        const initialQuery = args.userId
+            ? 'SELECT * FROM posts WHERE user_id = ?'
+            : 'SELECT * FROM posts';
+        const initialParams = args.userId ? [args.userId] : [];
         const { query, params } = getDataByAmount({
             amount: Number(args.amount),
-            query: 'SELECT * FROM posts',
+            query: initialQuery,
             page: Number(args.page),
-            params: []
+            params: initialParams
         });
         const { failed, rows } = await execute(query, params);
         if (failed) {
@@ -14,6 +18,17 @@ export class PostModel {
         }
         else {
             return rows;
+        }
+    }
+    static async getAmount(args) {
+        const query = `SELECT COUNT(*) as count FROM posts WHERE user_id = ?`;
+        const params = [args.userId];
+        const { failed, rows } = await execute(query, params);
+        if (failed || rows.length === 0) {
+            return 0;
+        }
+        else {
+            return rows[0].count;
         }
     }
     static async search(args) {
@@ -45,8 +60,14 @@ export class PostModel {
     static async create(args) {
         const query = 'INSERT INTO posts (user_id, content) VALUES (?, ?)';
         const params = [args.userId, args.content];
-        const { failed } = await execute(query, params);
-        return !failed;
+        const { error, rows: result } = await execute(query, params);
+        if (error) {
+            return null;
+        }
+        else {
+            const post = await this.getById({ id: result.insertId });
+            return post;
+        }
     }
     static async delete(args) {
         const query = 'DELETE FROM posts WHERE id = ?';

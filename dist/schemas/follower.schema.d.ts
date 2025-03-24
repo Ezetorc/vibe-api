@@ -10,7 +10,7 @@ declare const FollowerSchema: zod.ZodObject<{
     following_id: number;
 }>;
 export type Follower = zod.infer<typeof FollowerSchema>;
-export declare function validateFollower(object: any): zod.SafeParseReturnType<{
+export declare function validateFollower(object: unknown): zod.SafeParseReturnType<{
     follower_id: number;
     following_id: number;
 }, {

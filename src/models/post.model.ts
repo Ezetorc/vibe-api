@@ -5,12 +5,20 @@ import { getDataByAmount } from '../utilities/getDataByAmount.js'
 import { execute } from '../utilities/execute.js'
 
 export class PostModel {
-  static async getAll (args: { amount?: Query; page?: Query }): Promise<Post[]> {
+  static async getAll (args: {
+    amount?: Query
+    page?: Query
+    userId?: number
+  }): Promise<Post[]> {
+    const initialQuery = args.userId
+      ? 'SELECT * FROM posts WHERE user_id = ?'
+      : 'SELECT * FROM posts'
+    const initialParams = args.userId ? [args.userId] : []
     const { query, params } = getDataByAmount({
       amount: Number(args.amount),
-      query: 'SELECT * FROM posts',
+      query: initialQuery,
       page: Number(args.page),
-      params: []
+      params: initialParams
     })
 
     const { failed, rows } = await execute(query, params)
@@ -19,6 +27,19 @@ export class PostModel {
       return []
     } else {
       return rows as Post[]
+    }
+  }
+
+  static async getAmount (args: { userId: number }): Promise<number> {
+    const query = `SELECT COUNT(*) as count FROM posts WHERE user_id = ?`
+    const params = [args.userId]
+
+    const { failed, rows } = await execute(query, params)
+
+    if (failed || rows.length === 0) {
+      return 0
+    } else {
+      return rows[0].count as number
     }
   }
 
@@ -59,12 +80,21 @@ export class PostModel {
   static async create (args: {
     userId: number
     content: string
-  }): Promise<boolean> {
+  }): Promise<Post | null> {
     const query: string = 'INSERT INTO posts (user_id, content) VALUES (?, ?)'
     const params = [args.userId, args.content]
-    const { failed } = await execute(query, params)
+    const { error, rows: result } = await execute<ResultSetHeader>(
+      query,
+      params
+    )
 
-    return !failed
+    if (error) {
+      return null
+    } else {
+      const post: Post | null = await this.getById({ id: result.insertId })
+
+      return post
+    }
   }
 
   static async delete (args: { id: number }): Promise<boolean> {

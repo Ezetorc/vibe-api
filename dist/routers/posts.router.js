@@ -4,6 +4,7 @@ import { sessionMiddleware } from '../middlewares/session.middleware.js';
 export const PostRouter = Router();
 // GET
 PostRouter.get('/all', PostController.getAll);
+PostRouter.get('/amount', PostController.getAmount);
 PostRouter.get('/search', PostController.search);
 PostRouter.get('/id', PostController.getById);
 // POST

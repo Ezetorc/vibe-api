@@ -1,13 +1,31 @@
 import { Request, Response } from 'express'
 import { User, validatePartialUser } from '../schemas/user.schema.js'
 import { UserModel } from '../models/user.model.js'
-import { SafeParseReturnType } from 'zod'
 import { CLOUDINARY, COOKIES } from '../settings.js'
 import { Data } from '../structures/Data.js'
 import { SessionCookie } from '../structures/SessionCookie.js'
 import { getSessionCookie } from '../utilities/getSessionCookie.js'
 
 export class UserController {
+  static async exists (request: Request, response: Response): Promise<void> {
+    const { name, email } = request.query
+
+    if (!name && !email) {
+      response
+        .status(400)
+        .json(Data.failure('Any name or email has been passed'))
+      return
+    }
+
+    if (name) {
+      const nameExists = await UserModel.nameExists({ name: String(name) })
+      response.json(Data.success(nameExists))
+    } else if (email) {
+      const emailExists = await UserModel.emailExists({ email: String(email) })
+      response.json(Data.success(emailExists))
+    }
+  }
+
   static async liked (request: Request, response: Response): Promise<void> {
     const { type, userId, targetId } = request.query
 
@@ -108,7 +126,9 @@ export class UserController {
       return
     }
 
-    const user: User | null = await UserModel.getByEmail({ email: String(email) })
+    const user: User | null = await UserModel.getByEmail({
+      email: String(email)
+    })
 
     if (user) {
       response.json(Data.success(user))
@@ -119,7 +139,7 @@ export class UserController {
 
   static async register (request: Request, response: Response): Promise<void> {
     const { name, email, password } = request.body
-    const result: SafeParseReturnType<User, {}> = validatePartialUser({
+    const result = validatePartialUser({
       name,
       email,
       password
@@ -151,7 +171,7 @@ export class UserController {
 
   static async login (request: Request, response: Response): Promise<void> {
     const { name, password } = request.body
-    const result: SafeParseReturnType<User, {}> = validatePartialUser({
+    const result = validatePartialUser({
       name,
       password
     })
@@ -227,9 +247,7 @@ export class UserController {
       return
     }
 
-    const result: SafeParseReturnType<User, {}> = validatePartialUser(
-      request.body
-    )
+    const result = validatePartialUser(request.body)
 
     if (!result.success) {
       response.status(400).json(Data.failure(JSON.parse(result.error.message)))
