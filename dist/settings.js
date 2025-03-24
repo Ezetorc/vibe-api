@@ -14,6 +14,7 @@ mysqlConnection.connect(error => {
         console.error('❌ MySQL Connection error: ', error);
     }
 });
+console.log(envData.API_URL);
 export const ALLOWED_ORIGINS = [envData.API_URL ?? ''];
 export const PORT = Number(envData.PORT) || 3000;
 export const SALT_ROUNDS = Number(envData.SALT_ROUNDS) || 10;
