@@ -3,7 +3,6 @@ import { FollowerRouter } from './routers/follower.router.js'
 import { PostRouter } from './routers/posts.router.js'
 import { UserRouter } from './routers/user.router.js'
 import corsMiddleware from 'cors'
-import cookieMiddleware from 'cookie-parser'
 import express, { Application, json as jsonMiddleware } from 'express'
 import { ALLOWED_ORIGINS, PORT } from './settings.js'
 import { LikeRouter } from './routers/like.router.js'
@@ -13,7 +12,6 @@ const app: Application = express()
 
 app
   .disable('x-powered-by')
-  .use(cookieMiddleware())
   .use(
     corsMiddleware({
       origin: ALLOWED_ORIGINS,

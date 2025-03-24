@@ -35,14 +35,14 @@ export declare function validateComment(object: unknown): zod.SafeParseReturnTyp
 export declare function validatePartialComment(object: unknown): zod.SafeParseReturnType<{
     id?: number | undefined;
     content?: string | undefined;
-    created_at?: string | undefined;
     user_id?: number | undefined;
     post_id?: number | undefined;
+    created_at?: string | undefined;
 }, {
     id?: number | undefined;
     content?: string | undefined;
-    created_at?: string | undefined;
     user_id?: number | undefined;
     post_id?: number | undefined;
+    created_at?: string | undefined;
 }>;
 export {};

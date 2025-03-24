@@ -1,8 +1,7 @@
 import { validatePartialUser } from '../schemas/user.schema.js';
 import { UserModel } from '../models/user.model.js';
-import { CLOUDINARY, COOKIES } from '../settings.js';
+import { CLOUDINARY } from '../settings.js';
 import { Data } from '../structures/Data.js';
-import { getSessionCookie } from '../utilities/getSessionCookie.js';
 export class UserController {
     static async exists(request, response) {
         const { name, email } = request.query;
@@ -132,11 +131,7 @@ export class UserController {
             response.status(400).json(Data.failure('Error during register'));
             return;
         }
-        const sessionCookie = getSessionCookie(user);
-        response
-            .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
-            .status(201)
-            .json(Data.success(true));
+        response.status(201).json(Data.success(true));
     }
     static async login(request, response) {
         const { name, password } = request.body;
@@ -153,13 +148,7 @@ export class UserController {
             response.json(false);
             return;
         }
-        const sessionCookie = getSessionCookie(user);
-        response
-            .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
-            .json(Data.success(true));
-    }
-    static async logout(_request, response) {
-        response.clearCookie(COOKIES.SESSION).json(Data.success(true));
+        response.json(Data.success(true));
     }
     static async deleteImage(request, response) {
         const { id } = request.query;
@@ -214,9 +203,6 @@ export class UserController {
             response.json(Data.failure('User not found'));
             return;
         }
-        const sessionCookie = getSessionCookie(user);
-        response
-            .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
-            .json(Data.success(user));
+        response.json(Data.success(user));
     }
 }

@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { User } from '../schemas/user.schema.js';
 declare module 'express-serve-static-core' {
     interface Request {
-        user?: User;
+        userId?: number;
     }
 }
-export declare function sessionMiddleware(request: Request, response: Response, next: NextFunction): Promise<void>;
+export declare function sessionMiddleware(request: Request, response: Response, next: NextFunction): void;

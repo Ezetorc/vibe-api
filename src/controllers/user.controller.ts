@@ -1,10 +1,8 @@
 import { Request, Response } from 'express'
 import { User, validatePartialUser } from '../schemas/user.schema.js'
 import { UserModel } from '../models/user.model.js'
-import { CLOUDINARY, COOKIES } from '../settings.js'
+import { CLOUDINARY } from '../settings.js'
 import { Data } from '../structures/Data.js'
-import { SessionCookie } from '../structures/SessionCookie.js'
-import { getSessionCookie } from '../utilities/getSessionCookie.js'
 
 export class UserController {
   static async exists (request: Request, response: Response): Promise<void> {
@@ -161,12 +159,7 @@ export class UserController {
       return
     }
 
-    const sessionCookie: SessionCookie = getSessionCookie(user)
-
-    response
-      .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
-      .status(201)
-      .json(Data.success(true))
+    response.status(201).json(Data.success(true))
   }
 
   static async login (request: Request, response: Response): Promise<void> {
@@ -188,15 +181,7 @@ export class UserController {
       return
     }
 
-    const sessionCookie: SessionCookie = getSessionCookie(user)
-
-    response
-      .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
-      .json(Data.success(true))
-  }
-
-  static async logout (_request: Request, response: Response): Promise<void> {
-    response.clearCookie(COOKIES.SESSION).json(Data.success(true))
+    response.json(Data.success(true))
   }
 
   static async deleteImage (
@@ -271,10 +256,6 @@ export class UserController {
       return
     }
 
-    const sessionCookie: SessionCookie = getSessionCookie(user)
-
-    response
-      .cookie(COOKIES.SESSION, sessionCookie.token, sessionCookie.options)
-      .json(Data.success(user))
+    response.json(Data.success(user))
   }
 }

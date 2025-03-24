@@ -9,7 +9,6 @@ export declare class UserController {
     static getByEmail(request: Request, response: Response): Promise<void>;
     static register(request: Request, response: Response): Promise<void>;
     static login(request: Request, response: Response): Promise<void>;
-    static logout(_request: Request, response: Response): Promise<void>;
     static deleteImage(request: Request, response: Response): Promise<void>;
     static delete(request: Request, response: Response): Promise<void>;
     static update(request: Request, response: Response): Promise<void>;

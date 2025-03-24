@@ -13,7 +13,6 @@ UserRouter.get('/exists', UserController.exists);
 // POST
 UserRouter.post('/register', UserController.register);
 UserRouter.post('/login', UserController.login);
-UserRouter.post('/logout', sessionMiddleware, UserController.logout);
 UserRouter.post('/image', UserController.deleteImage);
 // DELETE
 UserRouter.delete('/', sessionMiddleware, UserController.delete);
