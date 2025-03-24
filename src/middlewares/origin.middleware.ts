@@ -7,20 +7,12 @@ export function originMiddleware (
   response: Response,
   next: NextFunction
 ) {
-  console.log('⚠️ Headers: ', request.headers)
-  const requestOrigin = request.headers.origin || request.headers.referer
+  const requestOrigin = request.headers['x-origin'] as string | undefined
 
   console.log('⚠️ Request Origin: ', requestOrigin)
-  
-  console.log(
-    '⚠️ isValid?: ',
-    !requestOrigin || !ALLOWED_ORIGINS.includes(requestOrigin)
-  )
 
   if (!requestOrigin) {
-    console.warn(
-      '⚠️ No origin detected, request may come from Postman or a server.'
-    )
+    console.warn('⚠️ No origin detected, add "x-origin" header')
     return
   }
 
