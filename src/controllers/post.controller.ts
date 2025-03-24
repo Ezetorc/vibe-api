@@ -29,7 +29,6 @@ export class PostController {
   }
 
   static async getAll (request: Request, response: Response): Promise<void> {
-    console.log('entered: ', request.query)
     const { amount, page, userId } = request.query
     const posts: Post[] = await PostModel.getAll({
       amount,
@@ -37,7 +36,6 @@ export class PostController {
       userId: Number(userId)
     })
 
-    console.log("posts: ", posts)
     response.json(Data.success(posts))
   }
 

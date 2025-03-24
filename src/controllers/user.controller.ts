@@ -3,6 +3,7 @@ import { User, validatePartialUser } from '../schemas/user.schema.js'
 import { UserModel } from '../models/user.model.js'
 import { CLOUDINARY } from '../settings.js'
 import { Data } from '../structures/Data.js'
+import { getAuthorization } from '../utilities/getAuthorization.js'
 
 export class UserController {
   static async exists (request: Request, response: Response): Promise<void> {
@@ -159,7 +160,12 @@ export class UserController {
       return
     }
 
-    response.status(201).json(Data.success(true))
+    const authorization = getAuthorization(user.id!)
+
+    response
+      .setHeader('Authorization', `Bearer ${authorization}`)
+      .setHeader('Access-Control-Expose-Headers', 'Authorization')
+      .json(Data.success({ user }))
   }
 
   static async login (request: Request, response: Response): Promise<void> {
@@ -181,7 +187,12 @@ export class UserController {
       return
     }
 
-    response.json(Data.success(true))
+    const authorization = getAuthorization(user.id!)
+
+    response
+      .setHeader('Authorization', `Bearer ${authorization}`)
+      .setHeader('Access-Control-Expose-Headers', 'Authorization')
+      .json(Data.success(true))
   }
 
   static async deleteImage (

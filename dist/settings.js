@@ -15,8 +15,8 @@ mysqlConnection.connect(error => {
     }
 });
 export const ALLOWED_ORIGINS = envData.NODE_ENV === 'development'
-    ? ['http://localhost:8888']
-    : ['https://vibe-page.vercel.app'];
+    ? [envData.DEVELOPMENT_FRONTEND ?? '']
+    : [envData.PRODUCTION_FRONTEND ?? ''];
 export const PORT = Number(envData.PORT) || 3000;
 export const SALT_ROUNDS = Number(envData.SALT_ROUNDS) || 10;
 export const SECRET_KEY = envData.SECRET_KEY || 'default_key';

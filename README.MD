@@ -107,15 +107,6 @@
   POST /users/login
   ```
 
-#### **POST /users/logout**
-
-- **Description:** Logs out a user and clears session cookies.
-- **Middleware:** Requires session authentication.
-- **Example:**
-  ```
-  POST /users/logout
-  ```
-
 #### **POST /users/image**
 
 - **Description:** Deletes a user's image from Cloudinary.
