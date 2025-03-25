@@ -5,7 +5,6 @@ import {
   validatePartialPost,
   validatePost
 } from '../schemas/post.schema.js'
-import { SafeParseReturnType } from 'zod'
 import { Data } from '../structures/Data.js'
 
 export class PostController {
@@ -73,7 +72,8 @@ export class PostController {
   }
 
   static async create (request: Request, response: Response): Promise<void> {
-    const result: SafeParseReturnType<Post, Post> = validatePost(request.body)
+    const result = validatePost(request.body)
+    console.log('result: ', result)
 
     if (!result.success) {
       response.status(400).json(Data.failure(result.error.toString()))
@@ -82,6 +82,8 @@ export class PostController {
 
     const { user_id: userId, content } = result.data
     const postCreated = await PostModel.create({ userId, content })
+
+    console.log('postCreated: ', postCreated)
 
     if (postCreated) {
       response.status(201).json(Data.success(postCreated))
