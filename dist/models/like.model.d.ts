@@ -3,6 +3,9 @@ export declare class LikeModel {
     static getAllOfPost(args: {
         postId: number;
     }): Promise<Like[]>;
+    static getLikeUserId(args: {
+        likeId: number;
+    }): Promise<number>;
     static getAmount(args: {
         targetId: number;
         type: 'comment' | 'post';

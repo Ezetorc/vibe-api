@@ -6,3 +6,6 @@ const FollowerSchema = zod.object({
 export function validateFollower(object) {
     return FollowerSchema.safeParse(object);
 }
+export function validatePartialFollower(object) {
+    return FollowerSchema.partial().safeParse(object);
+}

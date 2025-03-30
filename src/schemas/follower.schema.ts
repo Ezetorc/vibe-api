@@ -10,3 +10,7 @@ export type Follower = zod.infer<typeof FollowerSchema>
 export function validateFollower (object: unknown) {
   return FollowerSchema.safeParse(object)
 }
+
+export function validatePartialFollower (object: unknown) {
+  return FollowerSchema.partial().safeParse(object)
+}

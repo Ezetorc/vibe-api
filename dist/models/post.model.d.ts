@@ -6,7 +6,7 @@ export declare class PostModel {
         page?: Query;
         userId?: number;
     }): Promise<Post[]>;
-    static getAmount(args: {
+    static getCount(args: {
         userId: number;
     }): Promise<number>;
     static search(args: {
@@ -23,6 +23,9 @@ export declare class PostModel {
     static delete(args: {
         id: number;
     }): Promise<boolean>;
+    static getPostUserId(args: {
+        postId: number;
+    }): Promise<number>;
     static update(args: {
         id: number;
         object: Partial<Post>;

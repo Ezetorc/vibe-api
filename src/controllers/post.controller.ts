@@ -1,14 +1,10 @@
 import { Request, Response } from 'express'
 import { PostModel } from '../models/post.model.js'
-import {
-  Post,
-  validatePartialPost,
-  validatePost
-} from '../schemas/post.schema.js'
+import { Post, validatePartialPost } from '../schemas/post.schema.js'
 import { Data } from '../structures/Data.js'
 
 export class PostController {
-  static async getAmount (request: Request, response: Response): Promise<void> {
+  static async getCount (request: Request, response: Response): Promise<void> {
     const { userId } = request.query
 
     if (!userId) {
@@ -16,7 +12,7 @@ export class PostController {
       return
     }
 
-    const postsAmount: number = await PostModel.getAmount({
+    const postsAmount: number = await PostModel.getCount({
       userId: Number(userId)
     })
 
@@ -39,7 +35,7 @@ export class PostController {
   }
 
   static async getById (request: Request, response: Response): Promise<void> {
-    const { id } = request.query
+    const { id } = request.params
 
     if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
@@ -51,7 +47,7 @@ export class PostController {
     if (post) {
       response.json(Data.success(post))
     } else {
-      response.json(Data.failure('Post not found'))
+      response.status(404).json(Data.failure('Post not found'))
     }
   }
 
@@ -72,18 +68,20 @@ export class PostController {
   }
 
   static async create (request: Request, response: Response): Promise<void> {
-    const result = validatePost(request.body)
-    console.log('result: ', result)
+    const result = validatePartialPost(request.body)
+    const userId = request.userId
 
-    if (!result.success) {
-      response.status(400).json(Data.failure(result.error.toString()))
+    if (!result.success || !result.data.content || !userId) {
+      response
+        .status(400)
+        .json(
+          Data.failure(result.error?.toString() ?? 'Error during post creation')
+        )
       return
     }
 
-    const { user_id: userId, content } = result.data
+    const { content } = result.data
     const postCreated = await PostModel.create({ userId, content })
-
-    console.log('postCreated: ', postCreated)
 
     if (postCreated) {
       response.status(201).json(Data.success(postCreated))
@@ -93,10 +91,17 @@ export class PostController {
   }
 
   static async delete (request: Request, response: Response): Promise<void> {
-    const { id } = request.query
+    const { id } = request.params
 
     if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
+      return
+    }
+
+    const postUserId = await PostModel.getPostUserId({ postId: Number(id) })
+
+    if (postUserId !== request.userId) {
+      response.status(401).json(Data.failure('Post delete unauthorized'))
       return
     }
 
@@ -107,32 +112,5 @@ export class PostController {
     } else {
       response.json(Data.success(true))
     }
-  }
-
-  static async update (request: Request, response: Response): Promise<void> {
-    const postValidation = validatePartialPost(request.body)
-
-    if (!postValidation.success) {
-      response
-        .status(400)
-        .json(Data.failure(JSON.parse(postValidation.error.message)))
-      return
-    }
-
-    const { id } = request.query
-
-    const updateSuccess: boolean = await PostModel.update({
-      id: Number(id),
-      object: postValidation.data
-    })
-
-    if (!updateSuccess) {
-      response
-        .status(404)
-        .json(Data.failure('Post not found or no changes made'))
-      return
-    }
-
-    response.json(Data.success(true))
   }
 }

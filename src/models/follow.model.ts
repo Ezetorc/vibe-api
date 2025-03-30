@@ -1,7 +1,7 @@
 import { Follower } from '../schemas/follower.schema.js'
 import { execute } from '../utilities/execute.js'
 
-export class FollowerModel {
+export class FollowModel {
   static async getAll (): Promise<Follower[]> {
     const query: string = 'SELECT * FROM followers'
     const params: string[] = []
@@ -30,7 +30,7 @@ export class FollowerModel {
     }
   }
 
-  static async getUserFollowers (args: { userId: number }): Promise<Follower[]> {
+  static async getUserFollows (args: { userId: number }): Promise<Follower[]> {
     const query: string = 'SELECT * FROM followers WHERE following_id = ?'
     const params = [args.userId]
     const { failed, rows } = await execute(query, params)

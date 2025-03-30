@@ -5,21 +5,21 @@ import { sessionMiddleware } from '../middlewares/session.middleware.js'
 export const UserRouter = Router()
 
 // GET
-UserRouter.get('/all', UserController.getAll)
+UserRouter.get('/', UserController.getAll)
 UserRouter.get('/search', UserController.search)
-UserRouter.get('/id', UserController.getById)
-UserRouter.get('/name', UserController.getByName)
-UserRouter.get('/email', UserController.getByEmail)
-UserRouter.get('/liked', UserController.liked)
+UserRouter.get('/name/:name', UserController.getByName)
+UserRouter.get('/email/:email', UserController.getByEmail)
 UserRouter.get('/exists', UserController.exists)
+UserRouter.get('/:id', UserController.getById)
+UserRouter.get('/:id/liked', UserController.liked)
 
 // POST
 UserRouter.post('/register', UserController.register)
 UserRouter.post('/login', UserController.login)
-UserRouter.post('/image', UserController.deleteImage)
-
-// DELETE
-UserRouter.delete('/', sessionMiddleware, UserController.delete)
 
 // PATCH
 UserRouter.patch('/', sessionMiddleware, UserController.update)
+
+// DELETE
+UserRouter.delete('/', sessionMiddleware, UserController.delete)
+UserRouter.delete('/image/:publicId', sessionMiddleware, UserController.deleteImage)

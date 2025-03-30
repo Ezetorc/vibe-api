@@ -17,4 +17,11 @@ export declare function validateFollower(object: unknown): zod.SafeParseReturnTy
     follower_id: number;
     following_id: number;
 }>;
+export declare function validatePartialFollower(object: unknown): zod.SafeParseReturnType<{
+    follower_id?: number | undefined;
+    following_id?: number | undefined;
+}, {
+    follower_id?: number | undefined;
+    following_id?: number | undefined;
+}>;
 export {};

@@ -26,7 +26,8 @@ export class UserController {
   }
 
   static async liked (request: Request, response: Response): Promise<void> {
-    const { type, userId, targetId } = request.query
+    const { id } = request.params
+    const { type, targetId } = request.query
 
     if (!type) {
       response.status(400).json(Data.failure('Type is missing'))
@@ -38,7 +39,7 @@ export class UserController {
       return
     }
 
-    if (!userId) {
+    if (!id) {
       response.status(400).json(Data.failure('User ID is missing'))
       return
     }
@@ -51,13 +52,13 @@ export class UserController {
     if (type === 'comment') {
       const liked = await UserModel.likedComment({
         commentId: Number(targetId),
-        userId: Number(userId)
+        userId: Number(id)
       })
       response.json(Data.success(liked))
     } else if (type === 'post') {
       const liked = await UserModel.likedPost({
         postId: Number(targetId),
-        userId: Number(userId)
+        userId: Number(id)
       })
       response.json(Data.success(liked))
     }
@@ -84,7 +85,7 @@ export class UserController {
   }
 
   static async getById (request: Request, response: Response): Promise<void> {
-    const { id } = request.query
+    const { id } = request.params
 
     if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
@@ -101,7 +102,7 @@ export class UserController {
   }
 
   static async getByName (request: Request, response: Response): Promise<void> {
-    const { name } = request.query
+    const { name } = request.params
 
     if (!name) {
       response.status(400).json(Data.failure('Name is missing'))
@@ -118,7 +119,7 @@ export class UserController {
   }
 
   static async getByEmail (request: Request, response: Response): Promise<void> {
-    const { email } = request.query
+    const { email } = request.params
 
     if (!email) {
       response.status(400).json(Data.failure('Email is missing'))
@@ -199,14 +200,14 @@ export class UserController {
     request: Request,
     response: Response
   ): Promise<void> {
-    const { id } = request.query
+    const publicId = request.params
 
-    if (!id) {
+    if (!publicId) {
       response.status(400).json(Data.failure('ID is missing'))
       return
     }
 
-    const result = await CLOUDINARY.uploader.destroy(id as string)
+    const result = await CLOUDINARY.uploader.destroy(String(publicId))
 
     if (result.result === 'ok') {
       response.status(200).json(Data.success(true))
@@ -218,7 +219,7 @@ export class UserController {
   }
 
   static async delete (request: Request, response: Response): Promise<void> {
-    const { id } = request.query
+    const id = request.userId
 
     if (!id) {
       response.status(400).json(Data.failure('ID is missing'))
@@ -236,7 +237,7 @@ export class UserController {
   }
 
   static async update (request: Request, response: Response): Promise<void> {
-    const { id } = request.query
+    const id = request.userId
 
     if (!id) {
       response.status(400).json(Data.failure('ID is missing'))

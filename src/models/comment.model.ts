@@ -5,6 +5,38 @@ import { getDataByAmount } from '../utilities/getDataByAmount.js'
 import { execute } from '../utilities/execute.js'
 
 export class CommentModel {
+  static async getAllOfPost (args: {
+    postId: number
+    amount?: Query
+    page?: Query
+  }): Promise<Comment[]> {
+    const { query, params } = getDataByAmount({
+      amount: Number(args.amount),
+      query: 'SELECT * FROM comments WHERE post_id = ?',
+      page: Number(args.page),
+      params: [args.postId]
+    })
+    const { failed, rows } = await execute(query, params)
+
+    if (failed) {
+      return []
+    } else {
+      return rows as Comment[]
+    }
+  }
+
+  static async getCommentUserId (args: { commentId: number }): Promise<number> {
+    const query: string = `SELECT user_id FROM comments WHERE id = ?`
+    const params = [args.commentId]
+    const { failed, rows } = await execute(query, params)
+
+    if (failed || rows.length === 0) {
+      return -1
+    } else {
+      return rows[0].user_id
+    }
+  }
+
   static async getAll (args: {
     amount?: Query
     page?: Query
@@ -76,17 +108,5 @@ export class CommentModel {
     }
 
     return comment
-  }
-
-  static async getAllOfPost (args: { postId: number }): Promise<Comment[]> {
-    const query: string = 'SELECT * FROM comments WHERE post_id = ?'
-    const params = [args.postId]
-    const { failed, rows } = await execute(query, params)
-
-    if (failed) {
-      return []
-    } else {
-      return rows as Comment[]
-    }
   }
 }

@@ -1,14 +1,16 @@
 import { Router } from 'express'
 import { LikeController } from '../controllers/like.controller.js'
+import { sessionMiddleware } from '../middlewares/session.middleware.js'
 
 export const LikeRouter = Router()
 
 // GET
-LikeRouter.get('/all', LikeController.getAll)
-LikeRouter.get('/amount', LikeController.getAmount)
+LikeRouter.get('/', LikeController.getAll)
+LikeRouter.get('/count', LikeController.getCount)
+LikeRouter.get('/:id', LikeController.getById)
 
 // POST
-LikeRouter.post('/', LikeController.create)
+LikeRouter.post('/', sessionMiddleware, LikeController.create)
 
 // DELETE
-LikeRouter.delete('/id', LikeController.delete)
+LikeRouter.delete('/:id', sessionMiddleware, LikeController.delete)

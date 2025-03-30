@@ -5,16 +5,13 @@ import { sessionMiddleware } from '../middlewares/session.middleware.js'
 export const PostRouter = Router()
 
 // GET
-PostRouter.get('/all', PostController.getAll)
-PostRouter.get('/amount', PostController.getAmount)
+PostRouter.get('/', PostController.getAll)
+PostRouter.get('/count', PostController.getCount)
 PostRouter.get('/search', PostController.search)
-PostRouter.get('/id', PostController.getById)
+PostRouter.get('/:id', PostController.getById)
 
 // POST
 PostRouter.post('/', sessionMiddleware, PostController.create)
 
 // DELETE
-PostRouter.delete('/id', sessionMiddleware, PostController.delete)
-
-// PATCH
-PostRouter.patch('/id', sessionMiddleware, PostController.update)
+PostRouter.delete('/:id', sessionMiddleware, PostController.delete)

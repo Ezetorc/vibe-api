@@ -32,4 +32,17 @@ export declare function validateLike(object: unknown): zod.SafeParseReturnType<{
     id?: number | undefined;
     created_at?: string | undefined;
 }>;
+export declare function validatePartialLike(object: unknown): zod.SafeParseReturnType<{
+    type?: "post" | "comment" | undefined;
+    id?: number | undefined;
+    user_id?: number | undefined;
+    created_at?: string | undefined;
+    target_id?: number | undefined;
+}, {
+    type?: "post" | "comment" | undefined;
+    id?: number | undefined;
+    user_id?: number | undefined;
+    created_at?: string | undefined;
+    target_id?: number | undefined;
+}>;
 export {};

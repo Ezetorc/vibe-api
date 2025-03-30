@@ -15,6 +15,18 @@ export class LikeModel {
     }
   }
 
+  static async getLikeUserId (args: { likeId: number }): Promise<number> {
+    const query: string = `SELECT user_id FROM likes WHERE id = ?`
+    const params = [args.likeId]
+    const { failed, rows } = await execute(query, params)
+
+    if (failed || rows.length === 0) {
+      return -1
+    } else {
+      return rows[0].user_id
+    }
+  }
+
   static async getAmount (args: {
     targetId: number
     type: 'comment' | 'post'
@@ -88,10 +100,13 @@ export class LikeModel {
     const query =
       'INSERT INTO likes (target_id, type, user_id) VALUES (?, ?, ?)'
     const params = [args.targetId, args.type, args.userId]
-    const { failed, rows: result } = await execute<ResultSetHeader>(
-      query,
-      params
-    )
+    const {
+      failed,
+      rows: result,
+      error
+    } = await execute<ResultSetHeader>(query, params)
+
+    console.log('erro:', error)
 
     if (failed) {
       return null

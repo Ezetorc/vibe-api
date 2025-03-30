@@ -1,15 +1,12 @@
-import jsonwebtoken from 'jsonwebtoken'
+import jsonwebtoken, { JwtPayload } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
 import { SECRET_KEY } from '../settings.js'
+import { Data } from '../structures/Data.js'
 
 declare module 'express-serve-static-core' {
   interface Request {
     userId?: number
   }
-}
-
-interface JwtPayload {
-  userId: number
 }
 
 export function sessionMiddleware (
@@ -20,15 +17,19 @@ export function sessionMiddleware (
   const authorization = request.headers['authorization']?.split(' ')[1]
 
   if (!authorization) {
-    response.status(401).json({ message: 'No token provided' })
+    response.status(401).json(Data.failure('No authorization token provided'))
     return
   }
 
-  try {
-    const decoded = jsonwebtoken.verify(authorization, SECRET_KEY) as JwtPayload
-    request.userId = decoded.userId
+  jsonwebtoken.verify(authorization, SECRET_KEY, (error, userId) => {
+    if (error || !userId) {
+      response
+        .status(403)
+        .json(Data.failure('Invalid or expired authorization token'))
+      return
+    }
+
+    request.userId = Number((userId as JwtPayload).userId)
     next()
-  } catch {
-    response.status(403).json({ message: 'Invalid or expired token' })
-  }
+  })
 }

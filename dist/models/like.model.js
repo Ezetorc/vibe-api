@@ -11,6 +11,17 @@ export class LikeModel {
             return rows;
         }
     }
+    static async getLikeUserId(args) {
+        const query = `SELECT user_id FROM likes WHERE id = ?`;
+        const params = [args.likeId];
+        const { failed, rows } = await execute(query, params);
+        if (failed || rows.length === 0) {
+            return -1;
+        }
+        else {
+            return rows[0].user_id;
+        }
+    }
     static async getAmount(args) {
         const query = `SELECT COUNT(*) as count FROM likes WHERE target_id = ? AND type = ?`;
         const params = [args.targetId, args.type];
@@ -69,7 +80,8 @@ export class LikeModel {
     static async create(args) {
         const query = 'INSERT INTO likes (target_id, type, user_id) VALUES (?, ?, ?)';
         const params = [args.targetId, args.type, args.userId];
-        const { failed, rows: result } = await execute(query, params);
+        const { failed, rows: result, error } = await execute(query, params);
+        console.log('erro:', error);
         if (failed) {
             return null;
         }

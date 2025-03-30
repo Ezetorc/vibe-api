@@ -1,20 +1,20 @@
 import { Request, Response } from 'express'
-import { FollowerModel } from '../models/follower.model.js'
-import { Follower, validateFollower } from '../schemas/follower.schema.js'
+import { Follower } from '../schemas/follower.schema.js'
 import { Data } from '../structures/Data.js'
+import { FollowModel } from '../models/follow.model.js'
 
-export class FollowerController {
+export class FollowController {
   static async getAll (request: Request, response: Response): Promise<void> {
     const { userId } = request.query
     let followers: Follower[] = []
 
     if (userId) {
-      const newFollowers: Follower[] = await FollowerModel.getUserFollowers({
+      const newFollowers: Follower[] = await FollowModel.getUserFollows({
         userId: Number(userId)
       })
       followers = newFollowers
     } else {
-      const newFollowers: Follower[] = await FollowerModel.getAll()
+      const newFollowers: Follower[] = await FollowModel.getAll()
       followers = newFollowers
     }
 
@@ -39,7 +39,7 @@ export class FollowerController {
       return
     }
 
-    const followersAmount: number = await FollowerModel.getAmount({
+    const followersAmount: number = await FollowModel.getAmount({
       userId: Number(userId),
       type
     })
@@ -64,7 +64,7 @@ export class FollowerController {
       return
     }
 
-    const followExists: boolean = await FollowerModel.exists({
+    const followExists: boolean = await FollowModel.exists({
       followerId: Number(followerId),
       followingId: Number(followingId)
     })
@@ -73,20 +73,17 @@ export class FollowerController {
   }
 
   static async create (request: Request, response: Response): Promise<void> {
-    const isNewFollowerValid = validateFollower(request.body)
+    const { followingId } = request.params
 
-    if (!isNewFollowerValid.success) {
-      response
-        .status(400)
-        .json(Data.failure(isNewFollowerValid.error.toString()))
+    if (!followingId) {
+      response.status(400).json(Data.failure('Following ID params is missing'))
       return
     }
 
-    const { follower_id: followerId, following_id: followingId } =
-      isNewFollowerValid.data
-    const createSuccess: boolean = await FollowerModel.create({
+    const followerId = Number(request.userId)
+    const createSuccess: boolean = await FollowModel.create({
       followerId,
-      followingId
+      followingId: Number(followingId)
     })
 
     if (createSuccess) {
@@ -97,20 +94,17 @@ export class FollowerController {
   }
 
   static async delete (request: Request, response: Response): Promise<void> {
-    const isFollowerToDeleteValid = validateFollower(request.body)
+    const { followingId } = request.params
 
-    if (!isFollowerToDeleteValid.success) {
-      response
-        .status(400)
-        .json(Data.failure(isFollowerToDeleteValid.error.toString()))
+    if (!followingId) {
+      response.status(400).json(Data.failure('Following ID params is missing'))
       return
     }
 
-    const { follower_id: followerId, following_id: followingId } =
-      isFollowerToDeleteValid.data
-    const deleteSuccess: boolean = await FollowerModel.delete({
+    const followerId = Number(request.userId)
+    const deleteSuccess: boolean = await FollowModel.delete({
       followerId,
-      followingId
+      followingId: Number(followingId)
     })
 
     if (deleteSuccess) {

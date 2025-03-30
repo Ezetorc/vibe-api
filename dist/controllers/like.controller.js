@@ -1,9 +1,9 @@
 import { LikeModel } from '../models/like.model.js';
-import { validateLike } from '../schemas/like.schema.js';
+import { validatePartialLike } from '../schemas/like.schema.js';
 import { Data } from '../structures/Data.js';
 export class LikeController {
     static async getAll(request, response) {
-        const { id, type } = request.query;
+        const { type } = request.query;
         if (!type) {
             response.status(400).json(Data.failure('Type is missing'));
             return;
@@ -12,28 +12,30 @@ export class LikeController {
             response.status(400).json(Data.failure('Invalid type'));
             return;
         }
-        let likes = [];
-        if (id) {
-            const likeId = Number(id);
-            if (isNaN(likeId)) {
-                response.status(400).json(Data.failure('Invalid ID'));
-                return;
-            }
-            likes =
-                type === 'comment'
-                    ? await LikeModel.getAllOfComment({ commentId: likeId })
-                    : await LikeModel.getAllOfPost({ postId: likeId });
-        }
-        else {
-            likes =
-                type === 'comment'
-                    ? await LikeModel.getAllOfComments()
-                    : await LikeModel.getAllOfPosts();
-        }
+        const likes = type === 'comment'
+            ? await LikeModel.getAllOfComments()
+            : await LikeModel.getAllOfPosts();
         response.json(Data.success(likes));
     }
-    static async getAmount(request, response) {
+    static async getById(request, response) {
+        const { id } = request.params;
+        const likeId = Number(id);
+        console.log('id: ', likeId);
+        if (isNaN(likeId)) {
+            response.status(400).json(Data.failure('Invalid ID'));
+            return;
+        }
+        const like = await LikeModel.getById({ id: likeId });
+        if (like) {
+            response.json(Data.success(like));
+        }
+        else {
+            response.status(404).json(Data.failure('Like not found'));
+        }
+    }
+    static async getCount(request, response) {
         const { targetId, type } = request.query;
+        console.log('targetId: ', targetId, type);
         if (!type) {
             response.status(400).json(Data.failure('Type is missing'));
             return;
@@ -58,12 +60,15 @@ export class LikeController {
         }
     }
     static async create(request, response) {
-        const isNewLikeValid = validateLike(request.body);
-        if (!isNewLikeValid.success) {
-            response.status(400).json(Data.failure(isNewLikeValid.error.toString()));
+        const isNewLikeValid = validatePartialLike(request.body);
+        if (!isNewLikeValid.success ||
+            !isNewLikeValid.data.target_id ||
+            !isNewLikeValid.data.type) {
+            response.status(400).json(Data.failure('Invalid request body'));
             return;
         }
-        const { target_id: targetId, type, user_id: userId } = isNewLikeValid.data;
+        const userId = Number(request.userId);
+        const { target_id: targetId, type } = isNewLikeValid.data;
         const newLikeCreated = await LikeModel.create({
             targetId,
             type,
@@ -76,9 +81,14 @@ export class LikeController {
         response.json(Data.success(newLikeCreated));
     }
     static async delete(request, response) {
-        const { id } = request.query;
+        const { id } = request.params;
         if (!id) {
             response.status(400).json(Data.failure('ID is missing'));
+            return;
+        }
+        const likeUserId = await LikeModel.getLikeUserId({ likeId: Number(id) });
+        if (likeUserId !== request.userId) {
+            response.status(401).json(Data.failure('Like delete unauthorized'));
             return;
         }
         const likeDeleted = await LikeModel.delete({ id: Number(id) });

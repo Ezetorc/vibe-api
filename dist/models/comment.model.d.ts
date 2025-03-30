@@ -1,6 +1,14 @@
 import { Comment } from '../schemas/comment.schema.js';
 import { Query } from '../structures/Query.js';
 export declare class CommentModel {
+    static getAllOfPost(args: {
+        postId: number;
+        amount?: Query;
+        page?: Query;
+    }): Promise<Comment[]>;
+    static getCommentUserId(args: {
+        commentId: number;
+    }): Promise<number>;
     static getAll(args: {
         amount?: Query;
         page?: Query;
@@ -16,7 +24,4 @@ export declare class CommentModel {
     static delete(args: {
         commentId: number;
     }): Promise<Comment | null>;
-    static getAllOfPost(args: {
-        postId: number;
-    }): Promise<Comment[]>;
 }

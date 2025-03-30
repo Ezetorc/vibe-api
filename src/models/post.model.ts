@@ -30,7 +30,7 @@ export class PostModel {
     }
   }
 
-  static async getAmount (args: { userId: number }): Promise<number> {
+  static async getCount (args: { userId: number }): Promise<number> {
     const query = `SELECT COUNT(*) as count FROM posts WHERE user_id = ?`
     const params = [args.userId]
 
@@ -67,7 +67,6 @@ export class PostModel {
   static async getById (args: { id: number }): Promise<Post | null> {
     const query: string = 'SELECT * FROM posts WHERE id = ?'
     const params: number[] = [args.id]
-
     const { failed, rows } = await execute(query, params)
 
     if (failed) {
@@ -103,6 +102,18 @@ export class PostModel {
     const { failed } = await execute(query, params)
 
     return !failed
+  }
+
+  static async getPostUserId (args: { postId: number }): Promise<number> {
+    const query: string = `SELECT user_id FROM posts WHERE id = ?`
+    const params = [args.postId]
+    const { failed, rows } = await execute(query, params)
+
+    if (failed || rows.length === 0) {
+      return -1
+    } else {
+      return rows[0].user_id
+    }
   }
 
   static async update (args: {

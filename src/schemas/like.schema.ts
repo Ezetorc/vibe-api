@@ -13,3 +13,7 @@ export type Like = zod.infer<typeof LikeSchema>
 export function validateLike (object: unknown) {
   return LikeSchema.safeParse(object)
 }
+
+export function validatePartialLike (object: unknown) {
+  return LikeSchema.partial().safeParse(object)
+}

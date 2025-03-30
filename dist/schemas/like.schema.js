@@ -9,3 +9,6 @@ const LikeSchema = zod.object({
 export function validateLike(object) {
     return LikeSchema.safeParse(object);
 }
+export function validatePartialLike(object) {
+    return LikeSchema.partial().safeParse(object);
+}

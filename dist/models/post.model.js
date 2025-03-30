@@ -20,7 +20,7 @@ export class PostModel {
             return rows;
         }
     }
-    static async getAmount(args) {
+    static async getCount(args) {
         const query = `SELECT COUNT(*) as count FROM posts WHERE user_id = ?`;
         const params = [args.userId];
         const { failed, rows } = await execute(query, params);
@@ -74,6 +74,17 @@ export class PostModel {
         const params = [args.id];
         const { failed } = await execute(query, params);
         return !failed;
+    }
+    static async getPostUserId(args) {
+        const query = `SELECT user_id FROM posts WHERE id = ?`;
+        const params = [args.postId];
+        const { failed, rows } = await execute(query, params);
+        if (failed || rows.length === 0) {
+            return -1;
+        }
+        else {
+            return rows[0].user_id;
+        }
     }
     static async update(args) {
         if ('created_at' in args.object || 'id' in args.object) {
