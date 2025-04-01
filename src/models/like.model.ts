@@ -100,13 +100,10 @@ export class LikeModel {
     const query =
       'INSERT INTO likes (target_id, type, user_id) VALUES (?, ?, ?)'
     const params = [args.targetId, args.type, args.userId]
-    const {
-      failed,
-      rows: result,
-      error
-    } = await execute<ResultSetHeader>(query, params)
-
-    console.log('erro:', error)
+    const { failed, rows: result } = await execute<ResultSetHeader>(
+      query,
+      params
+    )
 
     if (failed) {
       return null

@@ -138,22 +138,22 @@ export class UserController {
   }
 
   static async register (request: Request, response: Response): Promise<void> {
-    const { name, email, password } = request.body
-    const result = validatePartialUser({
-      name,
-      email,
-      password
-    })
+    const result = validatePartialUser(request.body)
 
-    if (result.error) {
+    if (
+      result.error ||
+      !result.data.name ||
+      !result.data.email ||
+      !result.data.password
+    ) {
       response.status(400).json(Data.failure('Invalid user data'))
       return
     }
 
     const user: User | null = await UserModel.register({
-      name,
-      email,
-      password
+      name: result.data.name,
+      email: result.data.email,
+      password: result.data.password
     })
 
     if (!user) {
@@ -170,18 +170,17 @@ export class UserController {
   }
 
   static async login (request: Request, response: Response): Promise<void> {
-    const { name, password } = request.body
-    const result = validatePartialUser({
-      name,
-      password
-    })
+    const result = validatePartialUser(request.body)
 
-    if (!result.success) {
+    if (!result.success || !result.data.name || !result.data.password) {
       response.status(400).json(Data.failure('Invalid user data'))
       return
     }
 
-    const user: User | null = await UserModel.login({ name, password })
+    const user: User | null = await UserModel.login({
+      name: result.data.name,
+      password: result.data.password
+    })
 
     if (!user) {
       response.json(false)

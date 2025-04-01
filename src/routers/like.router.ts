@@ -7,7 +7,6 @@ export const LikeRouter = Router()
 // GET
 LikeRouter.get('/', LikeController.getAll)
 LikeRouter.get('/count', LikeController.getCount)
-LikeRouter.get('/:id', LikeController.getById)
 
 // POST
 LikeRouter.post('/', sessionMiddleware, LikeController.create)

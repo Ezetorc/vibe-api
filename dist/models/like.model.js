@@ -80,8 +80,7 @@ export class LikeModel {
     static async create(args) {
         const query = 'INSERT INTO likes (target_id, type, user_id) VALUES (?, ?, ?)';
         const params = [args.targetId, args.type, args.userId];
-        const { failed, rows: result, error } = await execute(query, params);
-        console.log('erro:', error);
+        const { failed, rows: result } = await execute(query, params);
         if (failed) {
             return null;
         }

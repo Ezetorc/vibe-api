@@ -1,6 +1,8 @@
-### Users API Documentation
+#### Vibe API Documentation
 
-#### **GET /users/all**
+### Users
+
+###### **GET /users**
 
 - **Description:** Retrieves a list of users.
 - **Query Parameters:**
@@ -8,154 +10,153 @@
   - `page` (optional): Page number for pagination.
 - **Example:**
   ```
-  GET /users/all?amount=10&page=1
+  GET /users/?amount=10&page=1
   ```
 
-#### **GET /users/exists**
+###### **GET /users/search**
 
-- **Description:** Retrieves if an user exists by his name or email.
+- **Description:** Searches for users by a given query.
 - **Query Parameters:**
-  - `name` : (Optional if email is passed) Name of the user.
-  - `email` : (Optional if name is passed) Email of the user.
+  - `query`: Word to search.
 - **Example:**
   ```
-  GET /users/exists?name=jhon&email=jhon@email.com
+  GET /users/search?query=john
   ```
 
-#### **GET /users/liked**
+###### **GET /users/name/:name**
 
-- **Description:** Retrieves if user liked an specific post or comment.
-- **Query Parameters:**
-  - `type` : "post" or "comment".
-  - `userId` : User ID to check.
-  - `targetId` : Target ID to check (ID of the post or the comment).
+- **Description:** Retrieves the user with the given name or returns null if it doesn't exist.
+- **Parameters:**
+  - `name`: Name of the user.
 - **Example:**
   ```
-  GET /users/liked?type=post&userId=123&targetId=123
+  GET /users/name/john
   ```
 
-#### **GET /users/search**
+###### **GET /users/email/:email**
 
-- **Description:** Searches for users based on a query string.
-- **Query Parameters:**
-  - `query` (required): Search term for finding users.
+- **Description:** Retrieves the user with the given email or returns null if it doesn't exist.
+- **Parameters:**
+  - `email`: Email of the user.
 - **Example:**
   ```
-  GET /users/search?query=John
+  GET /users/email/john@mail.com
   ```
 
-#### **GET /users/id**
+###### **GET /users/exists**
 
-- **Description:** Retrieves a user by their ID.
+- **Description:** Checks if a user with the given name or email exists. Only one parameter (name or email) is allowed per request.
 - **Query Parameters:**
-  - `id` (required): User ID.
+  - `name` (Optional if email is provided): Name of the user.
+  - `email` (Optional if name is provided): Email of the user.
 - **Example:**
   ```
-  GET /users/id?id=123
+  GET /users/exists?name=john
+  GET /users/exists?email=john@email.com
   ```
 
-#### **GET /users/name**
+###### **GET /users/:id**
 
-- **Description:** Retrieves a user by their name.
-- **Query Parameters:**
-  - `name` (required): User's name.
+- **Description:** Retrieves the user with the given ID. Returns a 404 error if the user is not found.
+- **Parameters:**
+  - `id`: ID of the user.
 - **Example:**
   ```
-  GET /users/name?name=JohnDoe
+  GET /users/123
   ```
 
-#### **GET /users/email**
+###### **GET /users/:id/liked**
 
-- **Description:** Retrieves a user by their email.
+- **Description:** Checks if the user liked a comment or post.
+- **Parameters:**
+  - `id`: ID of the user.
 - **Query Parameters:**
-  - `email` (required): User's email.
+  - `type`: 'comment' or 'post'.
+  - `targetId`: ID of the comment or post.
 - **Example:**
   ```
-  GET /users/email?email=johndoe@example.com
+  GET /users/123/liked?type=post&targetId=321
   ```
 
----
+###### **POST /users/register**
 
-#### **POST /users/register**
-
-- **Description:** Registers a new user.
-- **Request Body:**
-  ```json
-  {
-    "name": "John Doe",
-    "email": "johndoe@example.com",
-    "password": "securepassword"
-  }
-  ```
+- **Description:** Creates a new user and returns the authorization token along with the user object.
+- **Body:**
+  - `name`: Name of the user.
+  - `email`: Email of the user.
+  - `password`: Password of the user.
 - **Example:**
   ```
   POST /users/register
-  ```
-
-#### **POST /users/login**
-
-- **Description:** Logs in a user.
-- **Request Body:**
-  ```json
-  {
-    "name": "John Doe",
-    "password": "securepassword"
+  Body: {
+    "name": "John",
+    "email": "john@mail.com",
+    "password": "john123"
   }
   ```
+
+###### **POST /users/login**
+
+- **Description:** Retrieves the authorization token of the user.
+- **Body:**
+  - `name` or `email`: Username or email of the user.
+  - `password`: Password of the user.
 - **Example:**
   ```
   POST /users/login
+  Body: {
+    "email": "john@mail.com",
+    "password": "john123"
+  }
   ```
-
-#### **POST /users/image**
-
-- **Description:** Deletes a user's image from Cloudinary.
-- **Query Parameters:**
-  - `id` (required): Cloudinary image ID.
-- **Example:**
+  OR
   ```
-  POST /users/image?id=abc123
-  ```
-
----
-
-#### **DELETE /users**
-
-- **Description:** Deletes a user by ID.
-- **Middleware:** Requires session authentication.
-- **Query Parameters:**
-  - `id` (required): User ID.
-- **Example:**
-  ```
-  DELETE /users?id=123
-  ```
-
----
-
-#### **PATCH /users**
-
-- **Description:** Updates user information. id and created_at cant be updated.
-- **Middleware:** Requires session authentication.
-- **Request Body:**
-- **Query Parameters:**
-
-  - `id` (required): User ID.
-
-  ```json
-  {
-    "name": "Updated Name",
-    "email": "updatedemail@example.com"
+  POST /users/login
+  Body: {
+    "name": "John",
+    "password": "john123"
   }
   ```
 
+###### **PATCH /users**
+
+- **Description:** Requires an authorization header. Updates the user's information based on the request body.
+- **Body:**
+  - `name` (Optional): New name of the user.
+  - `password` (Optional): New password of the user.
+  - `email` (Optional): New email of the user.
+  - `image_id` (Optional): New image ID of the user.
+  - `image_url` (Optional): New image URL of the user.
+  - `description` (Optional): New description of the user.
 - **Example:**
   ```
-  PATCH /users?id=123
+  PATCH /users
+  Body: {
+    "name": "New John"
+  }
   ```
 
-### Posts API Documentation
+###### **DELETE /users**
 
-#### **GET /posts/all**
+- **Description:** Requires an authorization header. Deletes the authenticated user.
+- **Example:**
+  ```
+  DELETE /users
+  ```
+
+###### **DELETE /users/image/:publicId**
+
+- **Description:** Requires an authorization header. Deletes the profile image of the authenticated user.
+- **Parameters:**
+  - `publicId`: Public ID of the image in Cloudinary.
+- **Example:**
+  ```
+  DELETE /users/image/12345678
+  ```
+
+### Posts
+
+###### **GET /posts**
 
 - **Description:** Retrieves a list of posts.
 - **Query Parameters:**
@@ -164,244 +165,223 @@
   - `userId` (optional): ID of the owner of the posts.
 - **Example:**
   ```
-  GET /posts?amount=10&page=1
+  GET /posts/?amount=10&page=1&userId=123
   ```
 
-#### **GET /posts/amount**
+###### **GET /posts/count**
 
-- **Description:** Retrieves the number of posts of the user.
+- **Description:** Retrieves the amount of posts of the user.
 - **Query Parameters:**
-  - `userId` (optional): ID of the owner of the posts.
+  - `userId`: ID of the owner of the posts.
 - **Example:**
   ```
-  GET /posts/amount?userId=123
+  GET /posts/count?userId=123
   ```
 
-#### **GET /posts/search**
+###### **GET /posts/search**
 
-- **Description:** Searches for posts based on a query string.
+- **Description:** Searches for posts by a given query.
 - **Query Parameters:**
-  - `query` (required): Search term for finding posts.
-  - `userId` (optional): Filter posts by user ID.
+  - `query`: Word to search.
+  - `userId` (Optional): ID of the owner of the posts.
 - **Example:**
   ```
-  GET /posts/search?query=vacation&userId=123
+  GET /posts/search?query=john&userId=123
   ```
 
-#### **GET /posts/id**
+###### **GET /posts/:id**
 
-- **Description:** Retrieves a post by its ID.
-- **Query Parameters:**
-  - `id` (required): Post ID.
+- **Description:** Retrieves the post with the given ID. Returns a 404 error if the post is not found.
+- **Parameters:**
+  - `id`: ID of the post.
 - **Example:**
   ```
-  GET /posts/id?id=123
+  GET /posts/123
   ```
 
-#### **POST /posts**
+###### **POST /posts**
 
-- **Description:** Creates and returns a new post.
-- **Middleware:** Requires session authentication.
-- **Request Body:**
-  ```json
-  {
-    "user_id": 123,
-    "content": "This is a new post content."
-  }
-  ```
+- **Description:** Requires an authorization header. Creates a new post with the content given in the body and the user id of the authorization token.
+- **Body:**
+  - `content`: Content of the post.
 - **Example:**
   ```
   POST /posts
-  ```
-
-#### **DELETE /posts/id**
-
-- **Description:** Deletes a post by its ID.
-- **Middleware:** Requires session authentication.
-- **Query Parameters:**
-  - `id` (required): Post ID.
-- **Example:**
-  ```
-  DELETE /posts/id?id=123
-  ```
-
-#### **PATCH /posts/id**
-
-- **Description:** Updates an existing post.
-- **Middleware:** Requires session authentication.
-- **Query Parameters:**
-  - `id` (required): Post ID.
-- **Request Body:**
-  ```json
-  {
-    "content": "Updated content for the post."
+  Body: {
+    "content": "Hi, i'm Jhon!"
   }
   ```
+
+###### **DELETE /posts/:id**
+
+- **Description:** Requires an authorization header. Deletes the post.
+- **Parameters:**
+  - `id`: ID of the post to delete.
 - **Example:**
   ```
-  PATCH /posts/id?id=123
+  DELETE /posts/321
   ```
 
-### Likes API Documentation
+### Likes
 
-#### **GET /likes/all**
+###### **GET /likes**
 
 - **Description:** Retrieves a list of likes.
 - **Query Parameters:**
-  - `id` (optional): Target ID (post or comment) to filter likes.
-  - `type` (required): Type of the liked entity (`post` or `comment`).
+  - `type`: 'comment' or 'post'.
+  - `targetId` (optional): ID of the comment or post.
 - **Example:**
   ```
-  GET /likes/all?type=post&id=123
+  GET /likes/?type=post&targetId=321
   ```
 
-#### **GET /likes/amount**
+###### **GET /likes/count**
 
-- **Description:** Retrieves the amount of likes.
+- **Description:** Retrieves the amount of likes of a comment or post.
 - **Query Parameters:**
-  - `id` (optional): Target ID (post or comment) to filter likes.
-  - `type` (required): Type of the liked entity (`post` or `comment`).
+  - `type`: 'comment' or 'post'.
+  - `targetId` (optional): ID of the comment or post.
 - **Example:**
   ```
-  GET /likes/amount?type=post&targetId=123
+  GET /likes/count?type=post&targetId=321
   ```
 
-#### **POST /likes**
+###### **POST /likes**
 
-- **Description:** Creates a new like.
-- **Request Body:**
-  ```json
-  {
-    "target_id": 123,
-    "type": "post",
-    "user_id": 456
-  }
-  ```
+- **Description:** Requires an authorization header. Creates a new like.
+- **Body:**
+  - `type`: 'comment' or 'post'.
+  - `targetId`: ID of the comment or post.
 - **Example:**
   ```
   POST /likes
-  ```
-
-#### **DELETE /likes/id**
-
-- **Description:** Deletes a like by its ID.
-- **Query Parameters:**
-  - `id` (required): Like ID to delete.
-- **Example:**
-  ```
-  DELETE /likes/id?id=789
-  ```
-
-### Followers API Documentation
-
-#### **GET /followers/all**
-
-- **Description:** Retrieves a list of followers.
-- **Query Parameters:**
-  - `userId` (optional): User ID to filter followers.
-- **Example:**
-  ```
-  GET /followers?userId=123
-  ```
-
-#### **GET /followers/amount**
-
-- **Description:** Retrieves the amount of "followers" of "following" of the user.
-- **Query Parameters:**
-  - `userId` User ID to filter.
-  - `type` "follower" or "following".
-- **Example:**
-  ```
-  GET /followers/amount?userId=123&type=follower
-  ```
-
-#### **GET /followers/exists**
-
-- **Description:** Retrieves if the follow exists.
-- **Query Parameters:**
-  - `follower_id` Follower ID.
-  - `following_id` Following ID.
-- **Example:**
-  ```
-  GET /followers/exists?followerId=123&followingId=321
-  ```
-
-#### **POST /followers**
-
-- **Description:** Creates a new follower relationship.
-- **Request Body:**
-  ```json
-  {
-    "follower_id": 123,
-    "following_id": 456
+  Body: {
+    "type": "comment",
+    "targetId": 123
   }
   ```
+
+###### **DELETE /likes/:id**
+
+- **Description:** Requires an authorization header. Deletes a new like.
+- **Parameters:**
+  - `id`: ID of the like to delete.
 - **Example:**
   ```
-  POST /followers
+  DELETE /likes/321
   ```
 
-#### **DELETE /followers**
+### Follows
 
-- **Description:** Deletes a follower relationship.
-- **Request Body:**
-  ```json
-  {
-    "follower_id": 123,
-    "following_id": 456
-  }
-  ```
+###### **GET /follows**
+
+- **Description:** Retrieves a list of follows where the following_id is the one of the user with the id given in the userId query parameter.
+- **Query Parameters:**
+  - `userId` (Optional): ID of the following user.
 - **Example:**
   ```
-  DELETE /followers
+  GET /follows/?userId=123
   ```
 
-### Comments API Documentation
+###### **GET /follows/count**
 
-#### **GET /comments/all**
+- **Description:** Retrieves the amount of follows of the user.
+- **Query Parameters:**
+  - `type`: 'follower' or 'following'.
+  - `userId`: ID of the user.
+- **Example:**
+  ```
+  GET /follows/count?type=follower&userId=123
+  ```
+
+###### **GET /follows/exists**
+
+- **Description:** Retrieves the amount of follows of the user.
+- **Query Parameters:**
+  - `followerId`: ID of the user who is following.
+  - `followingId`: ID of the user who is being followed.
+- **Example:**
+  ```
+  GET /follows/exists?followerId=123&followingId=321
+  ```
+
+###### **POST /follows/:followingId**
+
+- **Description:** Requires an authorization header. Creates a new follow with the follower id being the one who is given in the authorization token.
+- **Parameter:**
+  - `followingId`: ID of the user who is being followed.
+- **Example:**
+  ```
+  POST /follows/321
+  ```
+
+###### **DELETE /follows/:followingId**
+
+- **Description:** Requires an authorization header. Deletes a follow with the follower id being the one who is given in the authorization token.
+- **Parameter:**
+  - `followingId`: ID of the user who is being followed.
+- **Example:**
+  ```
+  DELETE /follows/321
+  ```
+
+### Comments
+
+###### **GET /comments**
 
 - **Description:** Retrieves a list of comments.
 - **Query Parameters:**
   - `amount` (optional): Number of comments to retrieve.
   - `page` (optional): Page number for pagination.
-  - `postId` (optional): Filter comments by post ID.
 - **Example:**
   ```
-  GET /comments?amount=10&page=1&postId=123
+  GET /comments/?amount=10&page=1
   ```
 
-#### **GET /comments/id**
+###### **GET /comments/post/:postId**
 
-- **Description:** Retrieves a comment by its ID.
+- **Description:** Retrieves the amount of posts of the user.
+- **Parameters:**
+  - `postId`: ID of the post.
 - **Query Parameters:**
-  - `id` (required): Comment ID.
+  - `amount` (optional): Number of comments to retrieve.
+  - `page` (optional): Page number for pagination.
 - **Example:**
   ```
-  GET /comments/id?id=123
+  GET /comments/post/321?amount=10&page=1
   ```
 
-#### **POST /comments**
+###### **GET /comments/:id**
 
-- **Description:** Creates a new comment.
-- **Request Body:**
-  ```json
-  {
-    "post_id": 123,
-    "content": "This is a comment.",
-    "user_id": 456
-  }
+- **Description:** Retrieves a comment.
+- **Parameters:**
+  - `id`: ID of the comment.
+- **Example:**
   ```
+  GET /comments/123
+  ```
+
+###### **POST /comments**
+
+- **Description:** Requires an authorization header. Creates a new comment with the content and post id given in the body and the user id of the authorization token.
+- **Body:**
+  - `content`: Content of the comment.
+  - `post_id`: ID of the post.
 - **Example:**
   ```
   POST /comments
+  Body: {
+    "content": "Hi, i'm Jhon and i'm writing a comment!",
+    "post_id": 321
+  }
   ```
 
-#### **DELETE /comments**
+###### **DELETE /comments/:id**
 
-- **Description:** Deletes a comment by its ID.
-- **Query Parameters:**
-  - `id` (required): Comment ID.
+- **Description:** Requires an authorization header. Deletes the comment.
+- **Parameters:**
+  - `id`: ID of the comment to delete.
 - **Example:**
   ```
-  DELETE /comments?id=123
+  DELETE /comments/321
   ```
