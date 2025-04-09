@@ -11,9 +11,6 @@ const PostSchema = zod.object({
         .max(200, 'Content must be at most 300 characters.'),
     created_at: zod.string().optional()
 });
-export function validatePost(object) {
-    return PostSchema.safeParse(object);
-}
 export function validatePartialPost(object) {
     return PostSchema.partial().safeParse(object);
 }

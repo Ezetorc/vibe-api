@@ -32,12 +32,18 @@ export class PostModel {
         }
     }
     static async search(args) {
-        const query = args.userId
+        const initialQuery = args.userId
             ? 'SELECT * FROM posts WHERE content LIKE ? AND user_id = ?'
             : 'SELECT * FROM posts WHERE content LIKE ?';
-        const params = args.userId
+        const initialParams = args.userId
             ? [`%${args.query}%`, args.userId]
             : [`%${args.query}%`];
+        const { query, params } = getDataByAmount({
+            amount: Number(args.amount),
+            query: initialQuery,
+            page: Number(args.page),
+            params: initialParams
+        });
         const { rows, failed } = await execute(query, params);
         if (failed) {
             return [];

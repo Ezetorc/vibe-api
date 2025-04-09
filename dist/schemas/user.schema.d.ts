@@ -1,5 +1,5 @@
 import zod from 'zod';
-export declare const UserSchema: zod.ZodObject<{
+declare const UserSchema: zod.ZodObject<{
     id: zod.ZodOptional<zod.ZodNumber>;
     name: zod.ZodString;
     email: zod.ZodString;
@@ -28,25 +28,6 @@ export declare const UserSchema: zod.ZodObject<{
     image_url?: string | null | undefined;
 }>;
 export type User = zod.infer<typeof UserSchema>;
-export declare function validateUser(object: unknown): zod.SafeParseReturnType<{
-    name: string;
-    email: string;
-    password: string;
-    id?: number | undefined;
-    description?: string | null | undefined;
-    created_at?: string | undefined;
-    image_id?: string | null | undefined;
-    image_url?: string | null | undefined;
-}, {
-    name: string;
-    email: string;
-    password: string;
-    id?: number | undefined;
-    description?: string | null | undefined;
-    created_at?: string | undefined;
-    image_id?: string | null | undefined;
-    image_url?: string | null | undefined;
-}>;
 export declare function validatePartialUser(object: unknown): zod.SafeParseReturnType<{
     name?: string | undefined;
     id?: number | undefined;
@@ -66,3 +47,4 @@ export declare function validatePartialUser(object: unknown): zod.SafeParseRetur
     image_id?: string | null | undefined;
     image_url?: string | null | undefined;
 }>;
+export {};

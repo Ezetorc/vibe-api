@@ -1,6 +1,6 @@
 import zod from 'zod'
 
-export const UserSchema = zod.object({
+const UserSchema = zod.object({
   id: zod.number().optional(),
   name: zod
     .string({
@@ -33,10 +33,6 @@ export const UserSchema = zod.object({
 })
 
 export type User = zod.infer<typeof UserSchema>
-
-export function validateUser (object: unknown) {
-  return UserSchema.safeParse(object)
-}
 
 export function validatePartialUser (object: unknown) {
   return UserSchema.partial().safeParse(object)

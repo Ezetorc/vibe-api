@@ -13,7 +13,7 @@ export function originMiddleware(request, response, next) {
         return;
     }
     response.setHeader('Access-Control-Allow-Origin', requestOrigin);
-    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
     response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     response.setHeader('Access-Control-Allow-Credentials', 'true');
     if (request.method === 'OPTIONS') {

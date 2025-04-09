@@ -25,18 +25,17 @@ export declare class UserModel {
     static getByName(args: {
         name: string;
     }): Promise<User | null>;
-    static getByEmail(args: {
-        email: string;
-    }): Promise<User | null>;
     static search(args: {
         query: string;
+        amount: Query;
+        page: Query;
     }): Promise<User[]>;
     static register(args: {
         name: string;
         email: string;
         password: string;
     }): Promise<User | null>;
-    static login(args: {
+    static login(params: {
         name: string;
         password: string;
     }): Promise<User | null>;

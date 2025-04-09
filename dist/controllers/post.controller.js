@@ -42,14 +42,17 @@ export class PostController {
         }
     }
     static async search(request, response) {
-        const { query, userId } = request.query;
+        const { query } = request.params;
+        const { userId, amount, page } = request.query;
         if (!query) {
             response.status(400).json(Data.failure('Query is missing'));
             return;
         }
         const posts = await PostModel.search({
             query: String(query),
-            userId
+            userId,
+            amount,
+            page
         });
         response.json(Data.success(posts));
     }

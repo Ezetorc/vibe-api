@@ -72,14 +72,19 @@ export class UserController {
   }
 
   static async search (request: Request, response: Response): Promise<void> {
-    const { query } = request.query
+    const { query } = request.params
+    const { amount, page } = request.query
 
     if (!query) {
       response.status(400).json(Data.failure('Query parameter is missing'))
       return
     }
 
-    const users: User[] = await UserModel.search({ query: String(query) })
+    const users: User[] = await UserModel.search({
+      query: String(query),
+      amount,
+      page
+    })
 
     response.json(Data.success(users))
   }
@@ -98,42 +103,6 @@ export class UserController {
       response.json(Data.success(user))
     } else {
       response.status(404).json(Data.failure('User not found'))
-    }
-  }
-
-  static async getByName (request: Request, response: Response): Promise<void> {
-    const { name } = request.params
-
-    if (!name) {
-      response.status(400).json(Data.failure('Name is missing'))
-      return
-    }
-
-    const user: User | null = await UserModel.getByName({ name: String(name) })
-
-    if (user) {
-      response.json(Data.success(user))
-    } else {
-      response.status(404).json(Data.failure('User not found'))
-    }
-  }
-
-  static async getByEmail (request: Request, response: Response): Promise<void> {
-    const { email } = request.params
-
-    if (!email) {
-      response.status(400).json(Data.failure('Email is missing'))
-      return
-    }
-
-    const user: User | null = await UserModel.getByEmail({
-      email: String(email)
-    })
-
-    if (user) {
-      response.json(Data.success(user))
-    } else {
-      response.json(Data.failure('User not found'))
     }
   }
 
@@ -157,7 +126,7 @@ export class UserController {
     })
 
     if (!user) {
-      response.status(400).json(Data.failure('Error during register'))
+      response.status(401).json(Data.failure('Error during register'))
       return
     }
 
@@ -183,7 +152,7 @@ export class UserController {
     })
 
     if (!user) {
-      response.json(false)
+      response.json(Data.success(false))
       return
     }
 
@@ -206,7 +175,7 @@ export class UserController {
       return
     }
 
-    const result = await CLOUDINARY.uploader.destroy(String(publicId))
+    const result = await CLOUDINARY.uploader.destroy(String(publicId.publicId))
 
     if (result.result === 'ok') {
       response.status(200).json(Data.success(true))

@@ -4,7 +4,7 @@
   "main": "main.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/main.js"
+    "dev": "node dist/main.js"
   },
   "keywords": [],
   "type": "module",

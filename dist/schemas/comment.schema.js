@@ -12,9 +12,6 @@ const CommentSchema = zod.object({
         .max(200, 'Content must be at most 200 characters.'),
     created_at: zod.string().optional()
 });
-export function validateComment(object) {
-    return CommentSchema.safeParse(object);
-}
 export function validatePartialComment(object) {
     return CommentSchema.partial().safeParse(object);
 }

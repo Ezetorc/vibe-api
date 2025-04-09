@@ -88,22 +88,26 @@ export class UserModel {
     }
   }
 
-  static async getByEmail (args: { email: string }): Promise<User | null> {
-    const query = 'SELECT * FROM users WHERE email = ?'
-    const params = [args.email]
-    const { error, rows } = await execute(query, params)
-
-    if (error) {
-      return null
-    } else {
-      return rows.length > 0 ? (rows[0] as User) : null
-    }
-  }
-
-  static async search (args: { query: string }): Promise<User[]> {
-    const query =
+  static async search (args: {
+    query: string
+    amount: Query
+    page: Query
+  }): Promise<User[]> {
+    const initialQuery =
       'SELECT * FROM users WHERE name LIKE ? OR email LIKE ? OR description LIKE ?'
-    const params = [`%${args.query}%`, `%${args.query}%`, `%${args.query}%`]
+    const initialParams = [
+      `%${args.query}%`,
+      `%${args.query}%`,
+      `%${args.query}%`
+    ]
+
+    const { query, params } = getDataByAmount({
+      amount: Number(args.amount),
+      query: initialQuery,
+      page: Number(args.page),
+      params: initialParams
+    })
+
     const { rows, failed } = await execute(query, params)
 
     if (failed) {
@@ -140,16 +144,16 @@ export class UserModel {
     }
   }
 
-  static async login (args: {
+  static async login (params: {
     name: string
     password: string
   }): Promise<User | null> {
-    const user: User | null = await this.getByName({ name: args.name })
+    const user: User | null = await this.getByName({ name: params.name })
     const userExists: boolean = Boolean(user)
 
     if (!userExists) return null
 
-    const isValid: boolean = await bcrypt.compare(args.password, user!.password)
+    const isValid: boolean = await bcrypt.compare(params.password, user!.password)
 
     return isValid ? user : null
   }

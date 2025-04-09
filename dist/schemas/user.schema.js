@@ -1,5 +1,5 @@
 import zod from 'zod';
-export const UserSchema = zod.object({
+const UserSchema = zod.object({
     id: zod.number().optional(),
     name: zod
         .string({
@@ -30,9 +30,6 @@ export const UserSchema = zod.object({
         .optional(),
     created_at: zod.string().optional()
 });
-export function validateUser(object) {
-    return UserSchema.safeParse(object);
-}
 export function validatePartialUser(object) {
     return UserSchema.partial().safeParse(object);
 }

@@ -61,12 +61,17 @@ export class UserController {
         response.json(Data.success(users));
     }
     static async search(request, response) {
-        const { query } = request.query;
+        const { query } = request.params;
+        const { amount, page } = request.query;
         if (!query) {
             response.status(400).json(Data.failure('Query parameter is missing'));
             return;
         }
-        const users = await UserModel.search({ query: String(query) });
+        const users = await UserModel.search({
+            query: String(query),
+            amount,
+            page
+        });
         response.json(Data.success(users));
     }
     static async getById(request, response) {
@@ -83,54 +88,22 @@ export class UserController {
             response.status(404).json(Data.failure('User not found'));
         }
     }
-    static async getByName(request, response) {
-        const { name } = request.params;
-        if (!name) {
-            response.status(400).json(Data.failure('Name is missing'));
-            return;
-        }
-        const user = await UserModel.getByName({ name: String(name) });
-        if (user) {
-            response.json(Data.success(user));
-        }
-        else {
-            response.status(404).json(Data.failure('User not found'));
-        }
-    }
-    static async getByEmail(request, response) {
-        const { email } = request.params;
-        if (!email) {
-            response.status(400).json(Data.failure('Email is missing'));
-            return;
-        }
-        const user = await UserModel.getByEmail({
-            email: String(email)
-        });
-        if (user) {
-            response.json(Data.success(user));
-        }
-        else {
-            response.json(Data.failure('User not found'));
-        }
-    }
     static async register(request, response) {
-        const { name, email, password } = request.body;
-        const result = validatePartialUser({
-            name,
-            email,
-            password
-        });
-        if (result.error) {
+        const result = validatePartialUser(request.body);
+        if (result.error ||
+            !result.data.name ||
+            !result.data.email ||
+            !result.data.password) {
             response.status(400).json(Data.failure('Invalid user data'));
             return;
         }
         const user = await UserModel.register({
-            name,
-            email,
-            password
+            name: result.data.name,
+            email: result.data.email,
+            password: result.data.password
         });
         if (!user) {
-            response.status(400).json(Data.failure('Error during register'));
+            response.status(401).json(Data.failure('Error during register'));
             return;
         }
         const authorization = getAuthorization(user.id);
@@ -140,18 +113,17 @@ export class UserController {
             .json(Data.success({ user }));
     }
     static async login(request, response) {
-        const { name, password } = request.body;
-        const result = validatePartialUser({
-            name,
-            password
-        });
-        if (!result.success) {
+        const result = validatePartialUser(request.body);
+        if (!result.success || !result.data.name || !result.data.password) {
             response.status(400).json(Data.failure('Invalid user data'));
             return;
         }
-        const user = await UserModel.login({ name, password });
+        const user = await UserModel.login({
+            name: result.data.name,
+            password: result.data.password
+        });
         if (!user) {
-            response.json(false);
+            response.json(Data.success(false));
             return;
         }
         const authorization = getAuthorization(user.id);
@@ -166,7 +138,7 @@ export class UserController {
             response.status(400).json(Data.failure('ID is missing'));
             return;
         }
-        const result = await CLOUDINARY.uploader.destroy(String(publicId));
+        const result = await CLOUDINARY.uploader.destroy(String(publicId.publicId));
         if (result.result === 'ok') {
             response.status(200).json(Data.success(true));
         }

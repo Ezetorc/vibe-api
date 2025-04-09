@@ -16,10 +16,6 @@ const CommentSchema = zod.object({
 
 export type Comment = zod.infer<typeof CommentSchema>
 
-export function validateComment (object: unknown) {
-  return CommentSchema.safeParse(object)
-}
-
 export function validatePartialComment (object: unknown) {
   return CommentSchema.partial().safeParse(object)
 }

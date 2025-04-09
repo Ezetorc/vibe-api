@@ -64,20 +64,19 @@ export class UserModel {
             return rows.length > 0 ? rows[0] : null;
         }
     }
-    static async getByEmail(args) {
-        const query = 'SELECT * FROM users WHERE email = ?';
-        const params = [args.email];
-        const { error, rows } = await execute(query, params);
-        if (error) {
-            return null;
-        }
-        else {
-            return rows.length > 0 ? rows[0] : null;
-        }
-    }
     static async search(args) {
-        const query = 'SELECT * FROM users WHERE name LIKE ? OR email LIKE ? OR description LIKE ?';
-        const params = [`%${args.query}%`, `%${args.query}%`, `%${args.query}%`];
+        const initialQuery = 'SELECT * FROM users WHERE name LIKE ? OR email LIKE ? OR description LIKE ?';
+        const initialParams = [
+            `%${args.query}%`,
+            `%${args.query}%`,
+            `%${args.query}%`
+        ];
+        const { query, params } = getDataByAmount({
+            amount: Number(args.amount),
+            query: initialQuery,
+            page: Number(args.page),
+            params: initialParams
+        });
         const { rows, failed } = await execute(query, params);
         if (failed) {
             return [];
@@ -103,12 +102,12 @@ export class UserModel {
             return user;
         }
     }
-    static async login(args) {
-        const user = await this.getByName({ name: args.name });
+    static async login(params) {
+        const user = await this.getByName({ name: params.name });
         const userExists = Boolean(user);
         if (!userExists)
             return null;
-        const isValid = await bcrypt.compare(args.password, user.password);
+        const isValid = await bcrypt.compare(params.password, user.password);
         return isValid ? user : null;
     }
     static async delete(args) {

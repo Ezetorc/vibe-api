@@ -26,7 +26,7 @@ export function originMiddleware (
   response.setHeader('Access-Control-Allow-Origin', requestOrigin)
   response.setHeader(
     'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE, OPTIONS'
+    'GET, POST, PUT, DELETE, OPTIONS, PATCH'
   )
   response.setHeader(
     'Access-Control-Allow-Headers',

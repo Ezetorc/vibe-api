@@ -25,21 +25,6 @@ export class LikeController {
             response.json(Data.success(likes));
         }
     }
-    static async getById(request, response) {
-        const { id } = request.params;
-        const likeId = Number(id);
-        if (isNaN(likeId)) {
-            response.status(400).json(Data.failure('Invalid ID'));
-            return;
-        }
-        const like = await LikeModel.getById({ id: likeId });
-        if (like) {
-            response.json(Data.success(like));
-        }
-        else {
-            response.status(404).json(Data.failure('Like not found'));
-        }
-    }
     static async getCount(request, response) {
         const { targetId, type } = request.query;
         if (!type) {

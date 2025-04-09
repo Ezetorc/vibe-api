@@ -5,7 +5,7 @@ export const PostRouter = Router();
 // GET
 PostRouter.get('/', PostController.getAll);
 PostRouter.get('/count', PostController.getCount);
-PostRouter.get('/search', PostController.search);
+PostRouter.get('/search/:query', PostController.search);
 PostRouter.get('/:id', PostController.getById);
 // POST
 PostRouter.post('/', sessionMiddleware, PostController.create);

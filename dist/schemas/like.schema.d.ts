@@ -19,19 +19,6 @@ declare const LikeSchema: zod.ZodObject<{
     created_at?: string | undefined;
 }>;
 export type Like = zod.infer<typeof LikeSchema>;
-export declare function validateLike(object: unknown): zod.SafeParseReturnType<{
-    type: "post" | "comment";
-    user_id: number;
-    target_id: number;
-    id?: number | undefined;
-    created_at?: string | undefined;
-}, {
-    type: "post" | "comment";
-    user_id: number;
-    target_id: number;
-    id?: number | undefined;
-    created_at?: string | undefined;
-}>;
 export declare function validatePartialLike(object: unknown): zod.SafeParseReturnType<{
     type?: "post" | "comment" | undefined;
     id?: number | undefined;

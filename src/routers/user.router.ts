@@ -6,9 +6,7 @@ export const UserRouter = Router()
 
 // GET
 UserRouter.get('/', UserController.getAll)
-UserRouter.get('/search', UserController.search)
-UserRouter.get('/name/:name', UserController.getByName)
-UserRouter.get('/email/:email', UserController.getByEmail)
+UserRouter.get('/search/:query', UserController.search)
 UserRouter.get('/exists', UserController.exists)
 UserRouter.get('/:id', UserController.getById)
 UserRouter.get('/:id/liked', UserController.liked)

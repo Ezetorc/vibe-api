@@ -6,9 +6,6 @@ const LikeSchema = zod.object({
     type: zod.enum(['comment', 'post']),
     created_at: zod.string().optional()
 });
-export function validateLike(object) {
-    return LikeSchema.safeParse(object);
-}
 export function validatePartialLike(object) {
     return LikeSchema.partial().safeParse(object);
 }

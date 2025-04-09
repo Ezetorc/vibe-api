@@ -12,6 +12,8 @@ export declare class PostModel {
     static search(args: {
         query: string;
         userId?: Query;
+        amount?: Query;
+        page?: Query;
     }): Promise<Post[]>;
     static getById(args: {
         id: number;

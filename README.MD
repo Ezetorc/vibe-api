@@ -13,34 +13,17 @@
   GET /users/?amount=10&page=1
   ```
 
-###### **GET /users/search**
+###### **GET /users/search/:query**
 
 - **Description:** Searches for users by a given query.
-- **Query Parameters:**
+- **Parameters:**
   - `query`: Word to search.
+- **Query Parameters:**
+  - `amount` (optional): Number of users to retrieve.
+  - `page` (optional): Page number for pagination.
 - **Example:**
   ```
-  GET /users/search?query=john
-  ```
-
-###### **GET /users/name/:name**
-
-- **Description:** Retrieves the user with the given name or returns null if it doesn't exist.
-- **Parameters:**
-  - `name`: Name of the user.
-- **Example:**
-  ```
-  GET /users/name/john
-  ```
-
-###### **GET /users/email/:email**
-
-- **Description:** Retrieves the user with the given email or returns null if it doesn't exist.
-- **Parameters:**
-  - `email`: Email of the user.
-- **Example:**
-  ```
-  GET /users/email/john@mail.com
+  GET /users/search/john?amount=6&page=1
   ```
 
 ###### **GET /users/exists**
@@ -178,15 +161,18 @@
   GET /posts/count?userId=123
   ```
 
-###### **GET /posts/search**
+###### **GET /posts/search/:query**
 
 - **Description:** Searches for posts by a given query.
-- **Query Parameters:**
+- **Parameters:**
   - `query`: Word to search.
+- **Query Parameters:**
   - `userId` (Optional): ID of the owner of the posts.
+  - `amount` (optional): Number of posts to retrieve.
+  - `page` (optional): Page number for pagination.
 - **Example:**
   ```
-  GET /posts/search?query=john&userId=123
+  GET /posts/search/hello?userId=123&amount=6&page=2
   ```
 
 ###### **GET /posts/:id**

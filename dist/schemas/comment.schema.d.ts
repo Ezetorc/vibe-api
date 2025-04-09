@@ -19,19 +19,6 @@ declare const CommentSchema: zod.ZodObject<{
     created_at?: string | undefined;
 }>;
 export type Comment = zod.infer<typeof CommentSchema>;
-export declare function validateComment(object: unknown): zod.SafeParseReturnType<{
-    content: string;
-    user_id: number;
-    post_id: number;
-    id?: number | undefined;
-    created_at?: string | undefined;
-}, {
-    content: string;
-    user_id: number;
-    post_id: number;
-    id?: number | undefined;
-    created_at?: string | undefined;
-}>;
 export declare function validatePartialComment(object: unknown): zod.SafeParseReturnType<{
     id?: number | undefined;
     content?: string | undefined;
