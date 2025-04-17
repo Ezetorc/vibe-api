@@ -95,7 +95,6 @@ export class UserModel {
         const params = [args.name, args.email, hashedPassword];
         const { error, rows: result } = await execute(query, params);
         if (error) {
-            console.log('error: ', error);
             return null;
         }
         else {

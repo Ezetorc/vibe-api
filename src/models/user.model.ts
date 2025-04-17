@@ -136,7 +136,6 @@ export class UserModel {
     )
 
     if (error) {
-      console.log('error: ', error)
       return null
     } else {
       const user: User | null = await this.getById({ id: result.insertId })
