@@ -125,6 +125,8 @@ export class UserModel {
     const user: User | null = await this.getByName({ name: args.name })
     const userExists: boolean = Boolean(user)
 
+    console.log('userExists: ', userExists)
+
     if (userExists) return null
 
     const hashedPassword: string = await bcrypt.hash(args.password, SALT_ROUNDS)
@@ -136,10 +138,12 @@ export class UserModel {
     )
 
     if (error) {
+      console.log('error: ', error)
       return null
     } else {
       const user: User | null = await this.getById({ id: result.insertId })
 
+      console.log('acauser: ', user)
       return user
     }
   }
@@ -153,7 +157,10 @@ export class UserModel {
 
     if (!userExists) return null
 
-    const isValid: boolean = await bcrypt.compare(params.password, user!.password)
+    const isValid: boolean = await bcrypt.compare(
+      params.password,
+      user!.password
+    )
 
     return isValid ? user : null
   }

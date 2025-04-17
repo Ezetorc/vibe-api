@@ -107,9 +107,7 @@ export class UserController {
   }
 
   static async register (request: Request, response: Response): Promise<void> {
-    console.log('body: ', request.body)
     const result = validatePartialUser(request.body)
-    console.log('result: ', result)
 
     if (
       result.error ||
@@ -127,7 +125,7 @@ export class UserController {
       password: result.data.password
     })
 
-    console.log('user: ', user)
+    console.log('raaaaruser: ', user)
 
     if (!user) {
       response.status(401).json(Data.failure('Error during register'))
@@ -135,8 +133,6 @@ export class UserController {
     }
 
     const authorization = getAuthorization(user.id!)
-
-    console.log('authorization: ', authorization)
 
     response
       .setHeader('Authorization', `Bearer ${authorization}`)

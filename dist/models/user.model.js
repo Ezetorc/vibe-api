@@ -88,6 +88,7 @@ export class UserModel {
     static async register(args) {
         const user = await this.getByName({ name: args.name });
         const userExists = Boolean(user);
+        console.log('userExists: ', userExists);
         if (userExists)
             return null;
         const hashedPassword = await bcrypt.hash(args.password, SALT_ROUNDS);
@@ -95,10 +96,12 @@ export class UserModel {
         const params = [args.name, args.email, hashedPassword];
         const { error, rows: result } = await execute(query, params);
         if (error) {
+            console.log('error: ', error);
             return null;
         }
         else {
             const user = await this.getById({ id: result.insertId });
+            console.log('acauser: ', user);
             return user;
         }
     }
