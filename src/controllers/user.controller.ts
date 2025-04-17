@@ -125,8 +125,6 @@ export class UserController {
       password: result.data.password
     })
 
-    console.log('raaaaruser: ', user)
-
     if (!user) {
       response.status(401).json(Data.failure('Error during register'))
       return

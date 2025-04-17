@@ -102,7 +102,6 @@ export class UserController {
             email: result.data.email,
             password: result.data.password
         });
-        console.log('raaaaruser: ', user);
         if (!user) {
             response.status(401).json(Data.failure('Error during register'));
             return;

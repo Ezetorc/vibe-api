@@ -10,10 +10,19 @@ cloudinary.v2.config({
   api_secret: envData.CLOUD_API_SECRET
 })
 
-const mysqlConnection = mysql.createConnection(envData.MYSQL_PUBLIC_URL!)
-mysqlConnection.connect(error => {
-  if (error) {
-    console.error('❌ MySQL Connection error: ', error)
+const mysqlPool = mysql.createPool({
+  uri: envData.MYSQL_PUBLIC_URL,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+})
+
+mysqlPool.getConnection((error, connection) => {
+  if (connection) {
+    console.log('✅ MySQL pool connection established!')
+    connection.release()
+  } else if (error) {
+    console.error('❌ MySQL pool connection error:', error)
   }
 })
 
@@ -22,4 +31,4 @@ export const PORT: number = Number(envData.PORT) || 3000
 export const SALT_ROUNDS: number = Number(envData.SALT_ROUNDS) || 10
 export const SECRET_KEY: string = envData.SECRET_KEY || 'default_key'
 export const CLOUDINARY = cloudinary.v2
-export const DATABASE = mysqlConnection
+export const DATABASE = mysqlPool
