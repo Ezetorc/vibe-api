@@ -1,31 +1,33 @@
-import { config as dotenvConfig } from 'dotenv';
-import mysql from 'mysql2';
+import { config as setupEnvData } from 'dotenv';
+import mySQL from 'mysql2';
 import cloudinary from 'cloudinary';
-dotenvConfig();
+setupEnvData();
 const envData = process.env;
+if (!envData.CLOUD_NAME ||
+    !envData.CLOUD_API_KEY ||
+    !envData.CLOUD_API_SECRET) {
+    throw new Error('❌ Cloudinary env vars are missing');
+}
+if (!envData.DATABASE_URL) {
+    throw new Error('❌ Database env vars are missing');
+}
 cloudinary.v2.config({
     cloud_name: envData.CLOUD_NAME,
     api_key: envData.CLOUD_API_KEY,
     api_secret: envData.CLOUD_API_SECRET
 });
-const mySQLPool = mysql.createPool({
-    uri: envData.DATABASE_URL,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
-mySQLPool.getConnection((error, connection) => {
-    if (connection) {
-        console.log('✅ MySQL pool connection established!');
-        connection.release();
+const database = mySQL.createConnection(envData.DATABASE_URL);
+database.connect(error => {
+    if (error) {
+        console.error('❌ Database connection error: ' + error.message);
     }
-    else if (error) {
-        console.error('❌ MySQL pool connection error:', error);
+    else {
+        console.log('✅ Database connection established');
     }
 });
 export const ALLOWED_ORIGINS = [envData.FRONTEND_URL ?? ''];
 export const PORT = Number(envData.PORT) || 3000;
 export const SALT_ROUNDS = Number(envData.SALT_ROUNDS) || 10;
-export const SECRET_KEY = envData.SECRET_KEY || 'default_key';
+export const SECRET_KEY = envData.SECRET_KEY ?? 'default_key';
 export const CLOUDINARY = cloudinary.v2;
-export const DATABASE = mySQLPool;
+export const DATABASE = database;

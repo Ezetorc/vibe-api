@@ -5,6 +5,8 @@ export function execute<T = RowDataPacket[]> (
   query: string,
   params: unknown[]
 ): Promise<{ error: Error | null; rows: T; failed: boolean }> {
+  console.log('Calling database: ', query)
+
   return new Promise(resolve => {
     DATABASE.query(query, params, (error, rows) => {
       if (error) {

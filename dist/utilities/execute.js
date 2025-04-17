@@ -1,5 +1,6 @@
 import { DATABASE } from '../settings.js';
 export function execute(query, params) {
+    console.log('Calling database: ', query);
     return new Promise(resolve => {
         DATABASE.query(query, params, (error, rows) => {
             if (error) {
