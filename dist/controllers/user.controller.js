@@ -89,7 +89,9 @@ export class UserController {
         }
     }
     static async register(request, response) {
+        console.log('body: ', request.body);
         const result = validatePartialUser(request.body);
+        console.log('result: ', result);
         if (result.error ||
             !result.data.name ||
             !result.data.email ||
@@ -102,11 +104,13 @@ export class UserController {
             email: result.data.email,
             password: result.data.password
         });
+        console.log('user: ', user);
         if (!user) {
             response.status(401).json(Data.failure('Error during register'));
             return;
         }
         const authorization = getAuthorization(user.id);
+        console.log('authorization: ', authorization);
         response
             .setHeader('Authorization', `Bearer ${authorization}`)
             .setHeader('Access-Control-Expose-Headers', 'Authorization')
