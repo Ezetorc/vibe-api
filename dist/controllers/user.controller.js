@@ -3,6 +3,8 @@ import { UserModel } from '../models/user.model.js';
 import { CLOUDINARY } from '../settings.js';
 import { dataFailure, dataSuccess } from '../structures/Data.js';
 import { getAuthorization } from '../utilities/getAuthorization.js';
+import { getSanitizedUsers } from '../utilities/getSanitizedUsers.js';
+import { getSanitizedUser } from '../utilities/getSanitizedUser.js';
 export class UserController {
     static async exists(request, response) {
         const { name, email } = request.query;
@@ -58,7 +60,8 @@ export class UserController {
     static async getAll(request, response) {
         const { amount, page } = request.query;
         const users = await UserModel.getAll({ amount, page });
-        response.json(dataSuccess(users));
+        const sanitizedUsers = getSanitizedUsers(users);
+        response.json(dataSuccess(sanitizedUsers));
     }
     static async search(request, response) {
         const { query } = request.params;
@@ -72,7 +75,8 @@ export class UserController {
             amount,
             page
         });
-        response.json(dataSuccess(users));
+        const sanitizedUsers = getSanitizedUsers(users);
+        response.json(dataSuccess(sanitizedUsers));
     }
     static async getById(request, response) {
         const { id } = request.params;
@@ -82,7 +86,8 @@ export class UserController {
         }
         const user = await UserModel.getById({ id: Number(id) });
         if (user) {
-            response.json(dataSuccess(user));
+            const sanitizedUser = getSanitizedUser(user);
+            response.json(dataSuccess(sanitizedUser));
         }
         else {
             response.status(404).json(dataFailure('User not found'));
@@ -110,7 +115,7 @@ export class UserController {
         response
             .setHeader('Authorization', `Bearer ${authorization}`)
             .setHeader('Access-Control-Expose-Headers', 'Authorization')
-            .json(dataSuccess({ user }));
+            .json(dataSuccess(true));
     }
     static async login(request, response) {
         const result = validatePartialUser(request.body);
@@ -185,6 +190,7 @@ export class UserController {
             response.json(dataFailure('User not found'));
             return;
         }
-        response.json(dataSuccess(user));
+        const sanitizedUser = getSanitizedUser(user);
+        response.json(dataSuccess(sanitizedUser));
     }
 }

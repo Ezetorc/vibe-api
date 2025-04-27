@@ -4,6 +4,8 @@ import { UserModel } from '../models/user.model.js'
 import { CLOUDINARY } from '../settings.js'
 import { dataFailure, dataSuccess } from '../structures/Data.js'
 import { getAuthorization } from '../utilities/getAuthorization.js'
+import { getSanitizedUsers } from '../utilities/getSanitizedUsers.js'
+import { getSanitizedUser } from '../utilities/getSanitizedUser.js'
 
 export class UserController {
   static async exists (request: Request, response: Response): Promise<void> {
@@ -67,8 +69,9 @@ export class UserController {
   static async getAll (request: Request, response: Response): Promise<void> {
     const { amount, page } = request.query
     const users: User[] = await UserModel.getAll({ amount, page })
+    const sanitizedUsers: Partial<User>[] = getSanitizedUsers(users)
 
-    response.json(dataSuccess(users))
+    response.json(dataSuccess(sanitizedUsers))
   }
 
   static async search (request: Request, response: Response): Promise<void> {
@@ -85,8 +88,9 @@ export class UserController {
       amount,
       page
     })
+    const sanitizedUsers: Partial<User>[] = getSanitizedUsers(users)
 
-    response.json(dataSuccess(users))
+    response.json(dataSuccess(sanitizedUsers))
   }
 
   static async getById (request: Request, response: Response): Promise<void> {
@@ -100,7 +104,8 @@ export class UserController {
     const user: User | null = await UserModel.getById({ id: Number(id) })
 
     if (user) {
-      response.json(dataSuccess(user))
+      const sanitizedUser = getSanitizedUser(user)
+      response.json(dataSuccess(sanitizedUser))
     } else {
       response.status(404).json(dataFailure('User not found'))
     }
@@ -135,7 +140,7 @@ export class UserController {
     response
       .setHeader('Authorization', `Bearer ${authorization}`)
       .setHeader('Access-Control-Expose-Headers', 'Authorization')
-      .json(dataSuccess({ user }))
+      .json(dataSuccess(true))
   }
 
   static async login (request: Request, response: Response): Promise<void> {
@@ -236,6 +241,8 @@ export class UserController {
       return
     }
 
-    response.json(dataSuccess(user))
+    const sanitizedUser = getSanitizedUser(user)
+
+    response.json(dataSuccess(sanitizedUser))
   }
 }
