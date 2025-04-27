@@ -1,23 +1,43 @@
-import { DataError } from './DataError'
-import { DataSuccess } from './DataSuccess'
-import { DataValue } from './DataValue'
+import { DataError } from "./DataError"
+import { DataValue } from "./DataValue"
 
-export class Data<T> {
-  public value: DataValue<T>
-  public error: DataError
-  public success: DataSuccess
+abstract class Data<T> {
+  abstract isSuccess(): this is Success<T>
+  abstract isFailure(): this is Failure
+}
 
-  constructor (error: DataError, success: DataSuccess, value: DataValue<T>) {
-    this.value = value
-    this.error = error
-    this.success = success
+export class Success<T> extends Data<T> {
+  constructor(public readonly value: DataValue<T>) {
+    super()
   }
 
-  static failure (error: DataError): Data<null> {
-    return new Data(error, false, null)
+  isSuccess(): this is Success<T> {
+    return true
   }
 
-  static success<T> (value: DataValue<T>): Data<T> {
-    return new Data(null, true, value)
+  isFailure(): this is Failure {
+    return false
   }
+}
+
+export class Failure extends Data<never> {
+  constructor(public readonly error: DataError) {
+    super()
+  }
+
+  isSuccess(): this is Success<never> {
+    return false
+  }
+
+  isFailure(): this is Failure {
+    return true
+  }
+}
+
+export function dataSuccess<T>(value: DataValue<T>): Success<T> {
+  return new Success(value)
+}
+
+export function dataFailure(error: DataError): Failure {
+  return new Failure(error)
 }

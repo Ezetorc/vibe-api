@@ -1,16 +1,34 @@
-export class Data {
+class Data {
+}
+export class Success extends Data {
     value;
-    error;
-    success;
-    constructor(error, success, value) {
+    constructor(value) {
+        super();
         this.value = value;
+    }
+    isSuccess() {
+        return true;
+    }
+    isFailure() {
+        return false;
+    }
+}
+export class Failure extends Data {
+    error;
+    constructor(error) {
+        super();
         this.error = error;
-        this.success = success;
     }
-    static failure(error) {
-        return new Data(error, false, null);
+    isSuccess() {
+        return false;
     }
-    static success(value) {
-        return new Data(null, true, value);
+    isFailure() {
+        return true;
     }
+}
+export function dataSuccess(value) {
+    return new Success(value);
+}
+export function dataFailure(error) {
+    return new Failure(error);
 }

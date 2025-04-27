@@ -6,6 +6,9 @@ export declare class CommentModel {
         amount?: Query;
         page?: Query;
     }): Promise<Comment[]>;
+    static getAmountOfPost(args: {
+        postId: number;
+    }): Promise<number>;
     static getCommentUserId(args: {
         commentId: number;
     }): Promise<number>;

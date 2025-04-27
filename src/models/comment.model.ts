@@ -25,6 +25,18 @@ export class CommentModel {
     }
   }
 
+  static async getAmountOfPost (args: { postId: number }): Promise<number> {
+    const query = `SELECT COUNT(*) as count FROM comments WHERE post_id = ?`
+    const params = [args.postId]
+    const { failed, rows } = await execute(query, params)
+
+    if (failed) {
+      return -1
+    } else {
+      return rows[0].count as number
+    }
+  }
+
   static async getCommentUserId (args: { commentId: number }): Promise<number> {
     const query: string = `SELECT user_id FROM comments WHERE id = ?`
     const params = [args.commentId]

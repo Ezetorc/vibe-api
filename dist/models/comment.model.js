@@ -16,6 +16,17 @@ export class CommentModel {
             return rows;
         }
     }
+    static async getAmountOfPost(args) {
+        const query = `SELECT COUNT(*) as count FROM comments WHERE post_id = ?`;
+        const params = [args.postId];
+        const { failed, rows } = await execute(query, params);
+        if (failed) {
+            return -1;
+        }
+        else {
+            return rows[0].count;
+        }
+    }
     static async getCommentUserId(args) {
         const query = `SELECT user_id FROM comments WHERE id = ?`;
         const params = [args.commentId];

@@ -66,8 +66,8 @@ export class PostModel {
     static async create(args) {
         const query = 'INSERT INTO posts (user_id, content) VALUES (?, ?)';
         const params = [args.userId, args.content];
-        const { error, rows: result } = await execute(query, params);
-        if (error) {
+        const { failed, rows: result } = await execute(query, params);
+        if (failed) {
             return null;
         }
         else {

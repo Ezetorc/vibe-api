@@ -6,6 +6,7 @@ import { PORT } from './settings.js';
 import { LikeRouter } from './routers/like.router.js';
 import { originMiddleware } from './middlewares/origin.middleware.js';
 import { FollowRouter } from './routers/follow.router.js';
+import { NotificationRouter } from './routers/notification.router.js';
 const app = express();
 app
     .disable('x-powered-by')
@@ -16,4 +17,5 @@ app
     .use('/likes', LikeRouter)
     .use('/follows', FollowRouter)
     .use('/comments', CommentRouter)
+    .use('/notifications', NotificationRouter)
     .listen(PORT, '0.0.0.0', () => console.log('✅ Vibe API is active'));

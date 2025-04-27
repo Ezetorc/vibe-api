@@ -91,12 +91,12 @@ export class PostModel {
   }): Promise<Post | null> {
     const query: string = 'INSERT INTO posts (user_id, content) VALUES (?, ?)'
     const params = [args.userId, args.content]
-    const { error, rows: result } = await execute<ResultSetHeader>(
+    const { failed, rows: result } = await execute<ResultSetHeader>(
       query,
       params
     )
 
-    if (error) {
+    if (failed) {
       return null
     } else {
       const post: Post | null = await this.getById({ id: result.insertId })

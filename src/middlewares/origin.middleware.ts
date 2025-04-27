@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { ALLOWED_ORIGINS } from '../settings.js'
-import { Data } from '../structures/Data.js'
+import { dataFailure } from '../structures/Data.js'
 
 export function originMiddleware (
   request: Request,
@@ -13,13 +13,13 @@ export function originMiddleware (
     response
       .status(400)
       .json(
-        Data.failure('⚠️  No origin detected, add "referer" or "origin" header')
+        dataFailure('⚠️  No origin detected, add "referer" or "origin" header')
       )
     return
   }
 
   if (!ALLOWED_ORIGINS.includes(requestOrigin)) {
-    response.status(403).json(Data.failure('Access not authorized'))
+    response.status(403).json(dataFailure('Access not authorized'))
     return
   }
 

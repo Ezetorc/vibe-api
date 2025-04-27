@@ -5,6 +5,7 @@ export const CommentRouter = Router();
 // GET
 CommentRouter.get('/', CommentController.getAll);
 CommentRouter.get('/post/:postId', CommentController.getOfPost);
+CommentRouter.get('/post/amount/:postId', CommentController.getAmountOfPost);
 CommentRouter.get('/:id', CommentController.getById);
 // DELETE
 CommentRouter.delete('/:id', sessionMiddleware, CommentController.delete);
