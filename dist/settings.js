@@ -1,21 +1,11 @@
-import { config as setupEnvData } from 'dotenv';
 import mySQL from 'mysql2';
 import cloudinary from 'cloudinary';
-setupEnvData();
-const envData = process.env;
-if (!envData.CLOUD_NAME ||
-    !envData.CLOUD_API_KEY ||
-    !envData.CLOUD_API_SECRET) {
-    throw new Error('❌ Cloudinary env vars are missing');
+import { validateEnvData } from './schemas/EnvSchema.js';
+const { success, error, data: envData } = validateEnvData();
+if (!success) {
+    console.error('❌ Some .env variables are missing or incorrect: ', error.message);
+    process.exit(1);
 }
-if (!envData.DATABASE_URL) {
-    throw new Error('❌ Database env vars are missing');
-}
-cloudinary.v2.config({
-    cloud_name: envData.CLOUD_NAME,
-    api_key: envData.CLOUD_API_KEY,
-    api_secret: envData.CLOUD_API_SECRET
-});
 const database = mySQL.createConnection(envData.DATABASE_URL);
 database.connect(error => {
     if (error) {
@@ -25,9 +15,13 @@ database.connect(error => {
         console.log('✅ Database connection established');
     }
 });
-export const ALLOWED_ORIGINS = [envData.FRONTEND_URL ?? ''];
-export const PORT = Number(envData.PORT) || 3000;
-export const SALT_ROUNDS = Number(envData.SALT_ROUNDS) || 10;
-export const SECRET_KEY = envData.SECRET_KEY ?? 'default_key';
+cloudinary.v2.config({
+    cloud_name: 'ddugvrea9',
+    api_key: envData.CLOUD_API_KEY,
+    api_secret: envData.CLOUD_API_SECRET
+});
+export const { SECRET_KEY, FRONTEND_URL } = envData;
+export const PORT = Number(envData.PORT);
+export const SALT_ROUNDS = Number(envData.SALT_ROUNDS);
 export const CLOUDINARY = cloudinary.v2;
 export const DATABASE = database;

@@ -3,7 +3,7 @@ import { DATABASE } from '../settings.js'
 
 export function execute<T = RowDataPacket[]> (
   query: string,
-  params: unknown[]
+  params: unknown[] = []
 ): Promise<{ error: Error | null; rows: T; failed: boolean }> {
   return new Promise(resolve => {
     DATABASE.query(query, params, (error, rows) => {

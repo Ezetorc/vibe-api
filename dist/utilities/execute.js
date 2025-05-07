@@ -1,5 +1,5 @@
 import { DATABASE } from '../settings.js';
-export function execute(query, params) {
+export function execute(query, params = []) {
     return new Promise(resolve => {
         DATABASE.query(query, params, (error, rows) => {
             if (error) {

@@ -1,12 +1,12 @@
-import { CommentRouter } from './routers/comment.router.js'
-import { PostRouter } from './routers/post.router.js'
-import { UserRouter } from './routers/user.router.js'
+import { CommentRouter } from './routers/CommentRouter.js'
+import { PostRouter } from './routers/PostRouter.js'
+import { UserRouter } from './routers/UserRouter.js'
 import express, { Application, json as jsonMiddleware } from 'express'
 import { PORT } from './settings.js'
-import { LikeRouter } from './routers/like.router.js'
-import { originMiddleware } from './middlewares/origin.middleware.js'
-import { FollowRouter } from './routers/follow.router.js'
-import { NotificationRouter } from './routers/notification.router.js'
+import { LikeRouter } from './routers/LikeRouter.js'
+import { originMiddleware } from './middlewares/originMiddleware.js'
+import { FollowRouter } from './routers/FollowRouter.js'
+import { NotificationRouter } from './routers/NotificationRouter.js'
 
 const app: Application = express()
 
