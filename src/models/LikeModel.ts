@@ -116,8 +116,8 @@ export class LikeModel {
   static async delete (args: { id: number }): Promise<boolean> {
     const query: string = 'DELETE FROM likes WHERE id = ?'
     const params = [args.id]
-    const { failed } = await execute(query, params)
+    const { success } = await execute(query, params)
 
-    return !failed
+    return success
   }
 }

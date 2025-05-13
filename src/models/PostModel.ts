@@ -108,9 +108,9 @@ export class PostModel {
   static async delete (args: { id: number }): Promise<boolean> {
     const query: string = 'DELETE FROM posts WHERE id = ?'
     const params: number[] = [args.id]
-    const { failed } = await execute(query, params)
+    const { success } = await execute(query, params)
 
-    return !failed
+    return success
   }
 
   static async getPostUserId (args: { postId: number }): Promise<number> {
@@ -141,8 +141,8 @@ export class PostModel {
     const params = [...Object.values(args.object), args.id]
     const query = `UPDATE posts SET ${setClause} WHERE id = ?`
 
-    const { failed } = await execute<ResultSetHeader>(query, params)
+    const { success } = await execute<ResultSetHeader>(query, params)
 
-    return !failed
+    return success
   }
 }

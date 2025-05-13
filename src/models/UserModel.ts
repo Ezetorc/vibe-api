@@ -27,17 +27,17 @@ export class UserModel {
   static async nameExists (args: { name: string }): Promise<boolean> {
     const query = `SELECT COUNT(*) AS user_count FROM users WHERE name = ?`
     const params = [args.name]
-    const { rows, failed } = await execute(query, params)
+    const { rows, success } = await execute(query, params)
 
-    return !failed && rows[0].user_count > 0
+    return success && rows[0].user_count > 0
   }
 
   static async emailExists (args: { email: string }): Promise<boolean> {
     const query = `SELECT COUNT(*) AS user_count FROM users WHERE email = ?`
     const params = [args.email]
-    const { rows, failed } = await execute(query, params)
+    const { rows, success } = await execute(query, params)
 
-    return !failed && rows[0].user_count > 0
+    return success && rows[0].user_count > 0
   }
 
   static async getById (args: { id: number }): Promise<User | null> {
@@ -59,9 +59,9 @@ export class UserModel {
     const query =
       'SELECT 1 FROM likes WHERE type = ? AND user_id = ? AND target_id = ?'
     const params = ['post', args.userId, args.postId]
-    const { failed, rows } = await execute(query, params)
+    const { success, rows } = await execute(query, params)
 
-    return !failed && rows.length > 0
+    return success && rows.length > 0
   }
 
   static async likedComment (args: {
@@ -71,9 +71,9 @@ export class UserModel {
     const query =
       'SELECT 1 FROM likes WHERE type = ? AND user_id = ? AND target_id = ?'
     const params = ['comment', args.userId, args.commentId]
-    const { failed, rows } = await execute(query, params)
+    const { success, rows } = await execute(query, params)
 
-    return !failed && rows.length > 0
+    return success && rows.length > 0
   }
 
   static async getByName (args: { name: string }): Promise<User | null> {
@@ -164,9 +164,9 @@ export class UserModel {
   static async delete (args: { id: number }): Promise<boolean> {
     const query = 'DELETE FROM users WHERE id = ?'
     const params = [args.id]
-    const { failed } = await execute(query, params)
+    const { success } = await execute(query, params)
 
-    return !failed
+    return success
   }
 
   static async update (args: {
@@ -189,8 +189,8 @@ export class UserModel {
     const params = [...Object.values(args.object), args.id]
     const query = `UPDATE users SET ${setClause} WHERE id = ?`
 
-    const { failed } = await execute<ResultSetHeader>(query, params)
+    const { success } = await execute<ResultSetHeader>(query, params)
 
-    return !failed
+    return success
   }
 }

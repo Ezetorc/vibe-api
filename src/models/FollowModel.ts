@@ -2,14 +2,17 @@ import { Follow } from '../schemas/FollowSchema.js'
 import { execute } from '../utilities/execute.js'
 
 export class FollowModel {
-  static async getAll (): Promise<Follow[]> {
-    const query: string = 'SELECT * FROM follows'
-    const { failed, rows } = await execute(query)
+  static async getUserFollowersIds (args: {
+    userId: number
+  }): Promise<number[]> {
+    const query: string =
+      'SELECT follower_id FROM follows WHERE following_id = ?'
+    const { failed, rows } = await execute(query, [args.userId])
 
     if (failed) {
       return []
     } else {
-      return rows as Follow[]
+      return rows.map(row => row.follower_id)
     }
   }
 
@@ -48,9 +51,9 @@ export class FollowModel {
     const query: string =
       'INSERT INTO follows (follower_id, following_id) VALUES (?, ?)'
     const params = [args.followerId, args.followingId]
-    const { failed } = await execute(query, params)
+    const { success } = await execute(query, params)
 
-    return !failed
+    return success
   }
 
   static async delete (args: {
@@ -60,9 +63,9 @@ export class FollowModel {
     const query: string =
       'DELETE FROM follows WHERE follower_id = ? AND following_id = ?'
     const params = [args.followerId, args.followingId]
-    const { failed } = await execute(query, params)
+    const { success } = await execute(query, params)
 
-    return !failed
+    return success
   }
 
   static async exists (args: {
@@ -72,8 +75,8 @@ export class FollowModel {
     const query =
       'SELECT 1 FROM follows WHERE follower_id = ? AND following_id = ?'
     const params = [args.followerId, args.followingId]
-    const { failed, rows } = await execute(query, params)
+    const { success, rows } = await execute(query, params)
 
-    return !failed && rows.length > 0
+    return success && rows.length > 0
   }
 }

@@ -1,13 +1,12 @@
 import { UserModel } from '../models/UserModel.js'
 import { Notification } from '../schemas/NotificationSchema.js'
-import { NotificationType } from './NotificationType.js'
 import { SanitizedUser } from './SanitizedUser.js'
 
 export class SanitizedNotification {
   public id: number
   public sender: Omit<SanitizedUser, 'created_at' | 'description'>
   public target_id: number
-  public type: NotificationType
+  public type: Notification['type']
   public data?: {
     post_id?: number
     comment_id?: number
@@ -19,7 +18,7 @@ export class SanitizedNotification {
     id: number
     sender: Omit<SanitizedUser, 'created_at' | 'description'>
     target_id: number
-    type: NotificationType
+    type: Notification['type']
     data?: {
       post_id?: number
       comment_id?: number

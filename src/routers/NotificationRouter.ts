@@ -6,10 +6,15 @@ export const NotificationRouter = Router()
 
 // GET
 NotificationRouter.get('/', NotificationController.getAll)
+NotificationRouter.get('/hasNew', sessionMiddleware, NotificationController.hasNew)
 
 // POST
 NotificationRouter.post('/', sessionMiddleware, NotificationController.create)
-NotificationRouter.post('/seen', sessionMiddleware, NotificationController.markAsSeen)
+NotificationRouter.post(
+  '/seen',
+  sessionMiddleware,
+  NotificationController.markAsSeen
+)
 
 // DELETE
 NotificationRouter.delete('/', sessionMiddleware, NotificationController.delete)

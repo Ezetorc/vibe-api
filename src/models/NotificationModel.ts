@@ -39,9 +39,9 @@ export class NotificationModel {
     const query = `UPDATE notifications SET seen = true WHERE id IN (${placeholders})`
     const params = args.notificationsIds
 
-    const { failed } = await execute(query, params)
+    const { success } = await execute(query, params)
 
-    return !failed
+    return success
   }
 
   static async getById (args: { id: number }): Promise<Notification | null> {
@@ -59,7 +59,7 @@ export class NotificationModel {
   static async create (args: {
     senderId: number
     targetId: number
-    type: 'comment' | 'like' | 'follow'
+    type: Notification['type']
     data?: object | null
   }): Promise<Notification | null> {
     const query = `INSERT INTO notifications (sender_id, target_id, type, data) VALUES (?, ?, ?, ?)`
@@ -86,11 +86,19 @@ export class NotificationModel {
     }
   }
 
+  static async hasNew (args: { userId: number }): Promise<boolean> {
+    const query = `SELECT 1 FROM notifications WHERE target_id = ? AND seen = 0 LIMIT 1`
+    const params: number[] = [args.userId]
+    const { rows } = await execute(query, params)
+
+    return rows.length > 0
+  }
+
   static async deleteOfUser (args: { userId: number }): Promise<boolean> {
     const query: string = 'DELETE FROM notifications WHERE target_id = ?'
     const params: number[] = [args.userId]
-    const { failed } = await execute(query, params)
+    const { success } = await execute(query, params)
 
-    return !failed
+    return success
   }
 }

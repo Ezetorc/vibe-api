@@ -21,6 +21,14 @@ export class NotificationController {
     response.json(dataSuccess(sanitizedNotifications))
   }
 
+  static async hasNew (request: Request, response: Response): Promise<void> {
+    const { userId } = request
+
+    const hasNotifications = await NotificationModel.hasNew({ userId: userId! })
+
+    response.json(dataSuccess(hasNotifications))
+  }
+
   static async create (request: Request, response: Response): Promise<void> {
     const result = validateNotification(request.body)
     const { userId } = request
@@ -62,6 +70,7 @@ export class NotificationController {
     const { notificationsIds } = request.body
 
     const isValidArray =
+      notificationsIds &&
       Array.isArray(notificationsIds) &&
       notificationsIds.every(id => typeof id === 'number')
 

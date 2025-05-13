@@ -124,9 +124,9 @@ export class UserController {
     }
 
     const user: User | null = await UserModel.register({
-      name: result.data.name,
-      email: result.data.email,
-      password: result.data.password
+      name: result.data.name.trim(),
+      email: result.data.email.trim(),
+      password: result.data.password.trim()
     })
 
     if (!user) {
@@ -151,8 +151,8 @@ export class UserController {
     }
 
     const user: User | null = await UserModel.login({
-      name: result.data.name,
-      password: result.data.password
+      name: result.data.name.trim(),
+      password: result.data.password.trim()
     })
 
     if (!user) {
@@ -191,14 +191,14 @@ export class UserController {
   }
 
   static async delete (request: Request, response: Response): Promise<void> {
-    const id = request.userId
+    const { userId } = request
 
-    if (!id) {
+    if (!userId) {
       response.status(400).json(dataFailure('ID is missing'))
       return
     }
 
-    const deleteSuccess: boolean = await UserModel.delete({ id: Number(id) })
+    const deleteSuccess: boolean = await UserModel.delete({ id: userId })
 
     if (!deleteSuccess) {
       response.status(404).json(dataFailure('User not found'))

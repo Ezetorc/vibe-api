@@ -1,24 +1,19 @@
 import { Request, Response } from 'express'
-import { Follow } from '../schemas/FollowSchema.js'
 import { dataFailure, dataSuccess } from '../structures/Data.js'
 import { FollowModel } from '../models/FollowModel.js'
 
 export class FollowController {
-  static async getAll (request: Request, response: Response): Promise<void> {
-    const { userId } = request.query
-    let follows: Follow[] = []
+  static async getFollowersIds (
+    request: Request,
+    response: Response
+  ): Promise<void> {
+    const { userId } = request
 
-    if (userId) {
-      const newFollows: Follow[] = await FollowModel.getUserFollows({
-        userId: Number(userId)
-      })
-      follows = newFollows
-    } else {
-      const newFollows: Follow[] = await FollowModel.getAll()
-      follows = newFollows
-    }
+    const followersIds: number[] = await FollowModel.getUserFollowersIds({
+      userId: Number(userId)
+    })
 
-    response.status(201).json(dataSuccess(follows))
+    response.status(201).json(dataSuccess(followersIds))
   }
 
   static async getAmount (request: Request, response: Response): Promise<void> {
@@ -89,7 +84,7 @@ export class FollowController {
     if (createSuccess) {
       response.status(201).json(dataSuccess(true))
     } else {
-      response.status(404).json(dataFailure('Error during follower creation'))
+      response.status(404).json(dataFailure('Error during follow creation'))
     }
   }
 

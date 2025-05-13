@@ -5,7 +5,7 @@ import { sessionMiddleware } from '../middlewares/sessionMiddleware.js'
 export const FollowRouter = Router()
 
 // GET
-FollowRouter.get('/', FollowController.getAll)
+FollowRouter.get('/id', sessionMiddleware, FollowController.getFollowersIds)
 FollowRouter.get('/count', FollowController.getAmount)
 FollowRouter.get('/exists', FollowController.exists)
 

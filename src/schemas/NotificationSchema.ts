@@ -5,7 +5,7 @@ const NotificationSchema = zod.object({
   id: zod.number().optional(),
   sender_id: zod.number(),
   target_id: zod.number(),
-  type: zod.enum(['comment', 'follow', 'like']),
+  type: zod.enum(['comment', 'follow', 'like', 'post']),
   data: zod
     .object({
       post_id: zod.number().optional(),
